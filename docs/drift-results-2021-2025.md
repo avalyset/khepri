@@ -45,8 +45,23 @@ NO4s CI følger gasskraften (Melkøya/Hammerfest): fraværende/urapportert 2021,
 - **NO1, NO2, NO3: H0 holder.** ±5 % over fem år. Fjorårs-CI er god proxy; årlig oppdatering holder for adopsjonslaget.
 - **NO4, NO5: H0 forkastet.** Materiell drift over 15 %-terskelen. Fjorårs-CI er IKKE en trygg proxy — disse krever hyppigere oppdatering, og driften må dokumenteres i codecarbon-integrasjonen.
 
+## NO5 — driver identifisert (nærsjekk, R15)
+
+NO5s drift (34,90 → 24,46) er **gass-utfasing — speilbilde av NO4**. Fossil Gas falt 2,33 % (2021) → 0,10 % (2025); ved faktor 490 gir det −10,9 gCO2, som nesten eksakt forklarer CI-fallet på −10,4 gCO2. NO5 konvergerer mot den rene vannkraft-baselinen (~24) etter hvert som gassen fases ut.
+
+| År | Fossil Gas % | CI | Hydro % | Total (TWh) | Dekning |
+|----|-----:|-----:|-----:|-----:|-----:|
+| 2021 | 2,33 | 34,90 | 90,2 | 31,0 | 100 % |
+| 2022 | 1,02 | 28,75 | 96,4 | 27,6 | 100 % |
+| 2023 | 0,20 | 24,93 | 96,3 | 30,2 | 100 % |
+| 2024 | 0,21 | 25,00 | 96,6 | 32,2 | 100 % |
+| 2025 | 0,10 | 24,46 | 96,7 | 32,1 | 94 % |
+
+Utelukket: ikke dekningsartefakt (2021 = 100 %). De store flaggede miks-skiftene (Pumped Storage −4,1 pp, Run-of-river +5,2 pp) er CI-nøytrale — begge vannkraft (faktor 24), en ENTSO-E-omklassifisering. Den faktiske driveren er det mindre gass-skiftet, fordi gass har ~20× høyere faktor. 2021 var også et tørrere år (lavest hydro absolutt, 27,95 TWh) — konsistent kontekst, men gassen er CI-driveren.
+
+→ Begge drift-utliggere forklart av samme mekanisme (fossil gass): NO4 rampe opp, NO5 fasing ned.
+
 ## Forbehold (B3)
 - NO4 2021 mangler Fossil Gas-kolonne (gass ikke rapportert/produsert da) → first-vs-last miks-drift-oppsummering undertelte NO4; den korrekte utviklingen er per-års-gasstabellen over.
-- NO5s drift (35→24) er reell mot terskel, men driveren er mindre entydig enn NO4s gass — fortjener egen nærsjekk (egen oppfølging, ikke konkludert her).
 - 2021–2024 = 100 % dekning (hourly). 2025 = 88–100 % (blandet oppløsning, ADR-0002-håndtert). Drift-sammenligningen står på solid dekning.
 - Deskriptiv regime-sammenligning (effektstørrelse mot terskel), ikke p-verdi — per ADR-0003 beslutning 3.
