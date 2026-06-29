@@ -122,6 +122,30 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
     }
 
 
+def ci_series(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
+    """Per-intervall CI (gCO2eq/kWh) som pandas Series — ADR-0001+0002.
+
+    Materialitet (ADR-0002): NaN i neglisjerbar type -> 0; intervall = NaN i serien
+    kun hvis en MATERIELL type er NaN. Brukes av forecast-laget (ADR-0004).
+    """
+    import pandas as _pd
+    occurring = list(df.columns)
+    included = [c for c in occurring if c in factors and c not in excluded]
+    zone_total_mean = float(df[occurring].mean().sum())
+    material = []
+    for c in included:
+        tm = float(df[c].mean())
+        sh = (tm / zone_total_mean * 100) if zone_total_mean else 0.0
+        if sh >= MATERIAL_MIN_SHARE_PCT and tm >= MATERIAL_MIN_MW:
+            material.append(c)
+    clean = df[material].notna().all(axis=1) if material else _pd.Series(True, index=df.index)
+    sub = df[included].fillna(0.0).clip(lower=0)
+    num = sum(sub[c] * factors[c] for c in included)
+    den = sub.sum(axis=1)
+    ci = (num / den).where(den > 0)
+    return ci.where(clean)
+
+
 def compute_sensitivity(df):
     """Som compute(), men inkluderer Waste/Other/Other renewable på flaggede proxyer."""
     factors2 = dict(FACTORS)
