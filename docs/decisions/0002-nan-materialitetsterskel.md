@@ -1,57 +1,60 @@
-# ADR-0002: Materialitetsterskel for NaN-eksklusjon
+# ADR-0002: Materiality threshold for NaN exclusion
 
-- **Status:** Vedtatt
-- **Dato:** 2026-06-29
-- **Presiserer:** [ADR-0001](0001-ci-beregningsmetode.md), Beslutning 2.
+- **Status:** Accepted
+- **Date:** 2026-06-29
+- **Refines:** [ADR-0001](0001-ci-beregningsmetode.md), Decision 2.
 
-## Kontekst
+## Context
 
-ADR-0001 Beslutning 2 ekskluderer et helt intervall hvis *en* inkludert
-(faktor-bærende) produksjonstype har NaN. Første 2025-kjøring avdekket at dette
-gir et **dekningsartefakt**: for NO2 og NO3 falt dekningen til ~31 % og ~27 %,
-drevet utelukkende av bi-typer med **neglisjerbar produksjon** som er urapportert
-(NaN) mesteparten av året:
+ADR-0001 Decision 2 excludes an entire interval if *one* included
+(factor-carrying) production type has NaN. The first 2025 run revealed that this
+produces a **coverage artefact**: for NO2 and NO3 coverage fell to ~31% and ~27%,
+driven exclusively by minor types with **negligible production** that are
+unreported (NaN) for most of the year:
 
-- NO2 **Wind Offshore**: NaN 55,9 % av året, men årssnitt **2,5 MW** (~0,04 % av miksen).
-- NO3 **Solar**: NaN 66,6 %, men årssnitt **0,0 MW**.
+- NO2 **Wind Offshore**: NaN 55.9% of the year, but annual mean **2.5 MW** (~0.04% of the mix).
+- NO3 **Solar**: NaN 66.6%, but annual mean **0.0 MW**.
 
-En urapportert type som uansett bidrar ~0 MW er ikke et reelt datatap. Å la den
-kaste 2/3 av ellers gyldige intervaller lar en kjent artefakt stå i kjernetallet.
+An unreported type that contributes ~0 MW regardless is not a real data loss.
+Letting it discard 2/3 of otherwise valid intervals leaves a known artefact in the
+core figure.
 
-## Beslutning
+## Decision
 
-Skill mellom **materielle** og **neglisjerbare** produksjonstyper, med en terskel
-**pre-registrert her — satt på prinsipielt grunnlag, ikke justert mot dekning**:
+Distinguish between **material** and **negligible** production types, with a
+threshold **pre-registered here — set on principled grounds, not tuned against
+coverage**:
 
-> En produksjonstype regnes som **neglisjerbar** i en sone dersom dens
-> årssnitt-bidrag er **< 0,5 % av sonens totale miks** ELLER **< 5 MW absolutt**.
-> Ellers er den **materiell**.
+> A production type is considered **negligible** in a zone if its
+> annual-mean contribution is **< 0.5% of the zone's total mix** OR **< 5 MW
+> absolute**. Otherwise it is **material**.
 
-Regler:
-1. **NaN i en neglisjerbar type → behandles som 0** (ikke datatap).
-2. Et intervall **ekskluderes kun ved NaN i en materiell type**.
-3. Dekningsgrad rapporteres fortsatt per sone. Hvilke typer som ble klassifisert
-   neglisjerbare rapporteres som provenans.
+Rules:
+1. **NaN in a negligible type → treated as 0** (not a data loss).
+2. An interval is **excluded only when NaN occurs in a material type**.
+3. Coverage is still reported per zone. Which types were classified as negligible
+   is reported as provenance.
 
-## Begrunnelse for terskelen
+## Rationale for the threshold
 
-Terskelen er valgt slik at en type under den **ikke kan flytte sone-CI målbart**:
-en type på < 5 MW eller < 0,5 % av miksen endrer det energi-vektede snittet med en
-brøkdel av en gCO2eq/kWh uansett hvilken faktor den har. Grensen er prinsipiell
-(neglisjerbar = umålbar effekt), ikke empirisk valgt for å maksimere dekning.
-Dobbel betingelse (relativ ELLER absolutt) fanger både små soner og små typer.
+The threshold is chosen so that a type below it **cannot move the zone CI
+measurably**: a type at < 5 MW or < 0.5% of the mix shifts the energy-weighted
+average by a fraction of a gCO2eq/kWh regardless of its factor. The boundary is
+principled (negligible = immeasurable effect), not empirically chosen to maximise
+coverage. The double condition (relative OR absolute) captures both small zones
+and small types.
 
-## Konsekvenser
+## Consequences
 
-- NO2/NO3-dekningen løftes til et representativt nivå uten å røre de andre sonene
-  (NO1/NO4/NO5 har allerede ≥ 93,6 % dekning og ingen materielle NaN-typer).
-- Kjernetallet hviler ikke lenger på et ~30 %-utvalg for NO2/NO3.
-- Terskelen er en fast del av metoden; endres den, kreves ny ADR.
+- NO2/NO3 coverage rises to a representative level without touching the other
+  zones (NO1/NO4/NO5 already have ≥ 93.6% coverage and no material NaN types).
+- The core figure no longer rests on a ~30%-sample for NO2/NO3.
+- The threshold is a fixed part of the method; changing it requires a new ADR.
 
-## Alternativer vurdert (forkastet)
+## Alternatives considered (rejected)
 
-- **Behold ADR-0001 strengt** — lar et kjent artefakt stå i kjernetallet.
-- **Terskel valgt etter å ha sett dekningen** — ville gjort "neglisjerbar" til en
-  frihetsgrad å fiske i; forkastet. Terskelen er pre-registrert.
-- **Dropp NaN-eksklusjon helt (NaN=0)** — forkastet i ADR-0001 (kunstig for
-  materielle typer).
+- **Retain ADR-0001 strictly** — leaves a known artefact in the core figure.
+- **Threshold chosen after seeing coverage** — would make "negligible" a degree
+  of freedom to fish with; rejected. The threshold is pre-registered.
+- **Drop NaN exclusion entirely (NaN=0)** — rejected in ADR-0001 (artificial for
+  material types).

@@ -1,52 +1,81 @@
-# Forecast-resultat (ADR-0004)
+# Forecast results (ADR-0004)
 
-Per-sone CI-forecast, 96t dag-vis, daglig 00:00-origin (CarbonCast-konvensjon). Modeller: flat/diurnal persistens (gulv), SARIMA (felt-baseline), LightGBM (ML). Metrikk: MAPE-mean (snitt dag 1-4) + MAE/RMSE/concordance (full i `~/khepri-data/forecast/`).
+Per-zone CI forecast, 96h day-wise, daily 00:00 origin (CarbonCast convention).
+Models: flat/diurnal persistence (floor), SARIMA (field baseline), LightGBM (ML).
+Metrics: MAPE-mean (average over days 1-4) + MAE/RMSE/concordance (full data in
+`~/khepri-data/forecast/`).
 
-## MAPE-mean per sone × modell
+## MAPE-mean per zone × model
 
-**PRIMÆR (test 2025, train ≤2023):**
+**PRIMARY (test 2025, train ≤2023):**
 
-| Sone | flat | diurnal | SARIMA | GBM |
+| Zone | flat | diurnal | SARIMA | GBM |
 |------|-----:|-----:|-----:|-----:|
-| NO1 | 2,65 | 2,71 | **2,47** | 2,58 |
-| NO2 | 3,99 | 4,28 | 3,96 | **3,94** |
-| NO3 | **6,84** | 7,48 | 6,87 | 7,89 |
-| NO4 | 7,86 | 7,88 | **7,24** | **35,65** ⚠ |
-| NO5 | 0,83 | 0,76 | 0,72 | 3,75 |
+| NO1 | 2.65 | 2.71 | **2.47** | 2.58 |
+| NO2 | 3.99 | 4.28 | 3.96 | **3.94** |
+| NO3 | **6.84** | 7.48 | 6.87 | 7.89 |
+| NO4 | 7.86 | 7.88 | **7.24** | **35.65** ⚠ |
+| NO5 | 0.83 | 0.76 | 0.72 | 3.75 |
 
-**SEKUNDÆR felt-eksakt (test H2 2021, train 2019–H1 2021):**
+**SECONDARY field-exact (test H2 2021, train 2019–H1 2021):**
 
-| Sone | flat | SARIMA | GBM | CarbonCast SE (ref) |
+| Zone | flat | SARIMA | GBM | CarbonCast SE (ref) |
 |------|-----:|-----:|-----:|-----:|
-| NO1 | 1,50 | 1,43 | **1,20** | |
-| NO2 | 4,79 | 4,13 | **3,50** | livssyklus **5,78** |
-| NO3 | 7,52 | 7,41 | **6,45** | direkte **10,07** |
-| NO4 | 3,23 | **2,94** | 3,29 | (PJM 4,80, ISO-NE 6,46, |
-| NO5 | 16,11 | 10,55 | **8,75** | CISO 13,37) |
+| NO1 | 1.50 | 1.43 | **1.20** | |
+| NO2 | 4.79 | 4.13 | **3.50** | lifecycle **5.78** |
+| NO3 | 7.52 | 7.41 | **6.45** | direct **10.07** |
+| NO4 | 3.23 | **2.94** | 3.29 | (PJM 4.80, ISO-NE 6.46, |
+| NO5 | 16.11 | 10.55 | **8.75** | CISO 13.37) |
 
-## Funn (B3 — rått)
+## Findings (B3 — raw)
 
-### 1. H0 holder i hovedsak: enkle modeller er nok for NO
-For de stabile vannkraft-sonene (NO1/NO2/NO3) er forbedringen fra SARIMA/GBM over flat persistens liten (1-11 %), og for NO3 2025 er **flat persistens beste modell**. Pre-registrert H0 (vannkraft-stabilt → lite å forutsi utover sesong) er **i hovedsak bekreftet**. Adopsjons-konsekvens: NO trenger ikke en tung forecaster — persistens/SARIMA er adekvat.
+### 1. H0 largely holds: simple models are sufficient for NO
+For the stable hydro zones (NO1/NO2/NO3) the improvement from SARIMA/GBM over
+flat persistence is small (1-11%), and for NO3 2025 **flat persistence is the best
+model**. The pre-registered H0 (hydro-stable → little to predict beyond
+seasonality) is **largely confirmed**. Adoption consequence: NO does not need a
+heavy forecaster — persistence/SARIMA is adequate.
 
-### 2. NO5 / ren-vannkraft: produksjonsbasert CI er nær-konstant (mono-faktor)
-NO5 2026: CI std=0,00, låst på 24,0 — fordi miksen er ~100 % vannkraft og alle hydro-undertyper deler IPCC-faktor 24. Persistens-MAPE 0,00 er **ekte men trivielt**: et nær-konstant signal bærer lite forutsigbar informasjon. Dette er en reell **grense ved produksjonsbasert per-sone CI for rene vannkraft-soner** — ikke modell-ferdighet.
+### 2. NO5 / pure-hydro: production-based CI is near-constant (mono-factor)
+NO5 2026: CI std = 0.00, locked at 24.0 — because the mix is ~100% hydro and all
+hydro subtypes share IPCC factor 24. Persistence MAPE 0.00 is **genuine but
+trivial**: a near-constant signal carries little predictable information. This is a
+real **limitation of production-based per-zone CI for pure-hydro zones** — not
+model skill.
 
-### 3. NO4 — leakage-sjekken er REN, akkurat som pre-registrert
-Pre-registrert forventning (Hammerfest-korreksjonen): NO4s store CI-bevegelser er en industriell hendelse (brann/restart), ikke forutsigbar fra CI-historikk. Bekreftet mot data:
-- **NO4 H2-2021 (anlegg offline, ren vannkraft): MAPE 2,94 — trivielt enkelt** (gass fraværende).
-- **NO4 2025/2026 (gass i drift, volatil): MAPE 7,24 / 10,51 — hardest av alle soner.**
-- **Ingen modell viser anomalt høy NO4-skill over hendelsesgrensene** → ingen leakage. SARIMA fanger sesong/diurnal, bommer på gass-sprangene (som forventet). **GBM kollapser på NO4 2025 (MAPE 35,65)** — ML overfitter og takler ikke det hendelses-drevne regimet.
-NO4 er hardest nettopp fordi hendelsen ikke ligger i historikken. Det er et ekte funn, ikke en modellsvakhet.
+### 3. NO4 — the leakage check is CLEAN, exactly as pre-registered
+Pre-registered expectation (Hammerfest correction): NO4's large CI movements are
+an industrial event (fire/restart), not predictable from CI history. Confirmed
+against data:
+- **NO4 H2-2021 (plant offline, pure hydro): MAPE 2.94 — trivially easy** (gas
+  absent).
+- **NO4 2025/2026 (gas in operation, volatile): MAPE 7.24 / 10.51 — hardest of
+  all zones.**
+- **No model shows anomalously high NO4 skill across event boundaries** → no
+  leakage. SARIMA captures seasonality/diurnal, misses the gas spikes (as
+  expected). **GBM collapses on NO4 2025 (MAPE 35.65)** — ML overfits and cannot
+  handle the event-driven regime.
+NO4 is hardest precisely because the event is not in the history. That is a genuine
+finding, not a model deficiency.
 
-### 4. GBM er ikke trygt bedre — SARIMA er det robuste valget
-GBM vinner i noen stabile tilfeller (sekundær NO1/NO2/NO3, +14-27 % over flat), men **kollapser katastrofalt på NO4 2025 (35,65 mot SARIMAs 7,24)**. En tung ML-modell er ikke en trygg default — den kan blåse opp på den volatile sonen. Støtter ADR-0004 beslutning 3 (low→high): SARIMA er sweet-spot.
+### 4. GBM is not safely better — SARIMA is the robust choice
+GBM wins in some stable cases (secondary NO1/NO2/NO3, +14-27% over flat), but
+**collapses catastrophically on NO4 2025 (35.65 vs SARIMA's 7.24)**. A heavy ML
+model is not a safe default — it can blow up on the volatile zone. Supports
+ADR-0004 Decision 3 (low→high): SARIMA is the sweet spot.
 
-### 5. Felt-sammenlignbarhet oppnådd (sekundær)
-NOs H2-2021-MAPE (1,2-10,5) ligger i **samme rom som CarbonCasts regioner** (SE 5,78 livssyklus, PJM 4,80, ISO-NE 6,46, CISO 13,37). NO er nå forecast-karakterisert på felt-sammenlignbart grunnlag — første per-sone NO-CI-forecast i feltets eval-konvensjon.
+### 5. Field comparability achieved (secondary)
+NO's H2-2021 MAPE (1.2-10.5) is in **the same room as CarbonCast's regions** (SE
+5.78 lifecycle, PJM 4.80, ISO-NE 6.46, CISO 13.37). NO is now forecast-
+characterised on field-comparable grounds — first per-zone NO CI forecast with the
+field's evaluation convention.
 
-## Forbehold
-- Forecast-origins = daglig 00:00 (CarbonCast-eksakt). SARIMA per origin på 45-dagers vindu (minne-trygt; fanger daglig sesong) — pragmatisk valg, dokumentert.
-- 2025/2026 blandet 15/60-min → timesnitt; korte hull (≤6t) interpolert; gap-andel rapportert per sone-år i `_run.log` (NO2/NO3 ~10-17 %).
-- GBM snitt av 3 seeds; SARIMA/persistens deterministiske (1 kjøring).
-- MAPE supplert med MAE/RMSE/concordance (full tabell i raw-CSV); concordance ~0,5 for stabile soner = nær-tilfeldig rekkefølge, konsistent med nær-konstant signal.
+## Caveats
+- Forecast origins = daily 00:00 (CarbonCast-exact). SARIMA per origin on a 45-day
+  window (memory-safe; captures daily seasonality) — pragmatic choice, documented.
+- 2025/2026 mixed 15/60-min → hourly average; short gaps (≤ 6h) interpolated; gap
+  fraction reported per zone-year in `_run.log` (NO2/NO3 ~10-17%).
+- GBM averaged over 3 seeds; SARIMA/persistence are deterministic (1 run).
+- MAPE supplemented with MAE/RMSE/concordance (full table in raw CSV); concordance
+  ~0.5 for stable zones = near-random ranking order, consistent with a
+  near-constant signal.

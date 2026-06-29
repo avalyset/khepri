@@ -1,43 +1,84 @@
-# ADR-0005: Adopsjon — codecarbon-integrasjon av NO per-sone CI
+# ADR-0005: Adoption — codecarbon integration of NO per-zone CI
 
-Status: Vedtatt
-Dato: 2026-06-29
-Bygger på: ADR-0001, ADR-0002, ADR-0003, ADR-0004
+Status: Accepted
+Date: 2026-06-29
+Builds on: ADR-0001, ADR-0002, ADR-0003, ADR-0004
 
-## Kontekst
-Khepris mål er å fylle hullet i norsk karbon-bevisst databehandling: codecarbon (verktøyet som måler AI/ML-utslipp) bruker en uniform placeholder (18.0 gCO2eq/kWh) for alle NO-soner i sin produksjons-fallback (nordic_emissions.json). Recon (verifisert mot kilde) bekreftet: strukturen er allerede per-sone, metoden er produksjons-/generasjonsmiks-basert (matcher ADR-0001), eksterne faktor-PR-er merges (presedens #1039/#1224), testene leser dynamisk fra JSON (oppdatering bryter dem ikke), og åpningen er uclaimet. Adopsjonen er en PR som erstatter NO1-NO5-verdiene med Khepris avledede, drift-karakteriserte tall.
+## Context
+Khepri's goal is to fill the gap in Norwegian carbon-aware computing: codecarbon
+(the tool that measures AI/ML emissions) uses a uniform placeholder (18.0
+gCO2eq/kWh) for all NO zones in its production fallback (nordic_emissions.json).
+Recon (verified against source) confirmed: the structure is already per-zone, the
+method is production-/generation-mix-based (matches ADR-0001), external factor PRs
+are merged (precedent #1039/#1224), the tests read dynamically from JSON (an update
+does not break them), and the opening is unclaimed. Adoption is a PR that replaces
+the NO1-NO5 values with Khepri's derived, drift-characterised figures.
 
-## Pre-registrerte beslutninger (låst før PR skrives)
+## Pre-registered decisions (locked before the PR is written)
 
-### 1. Faktor-basis: IPCC AR5, arvet fra ADR-0001
-PR-en bruker Khepris IPCC AR5 livssyklus-medianer (ADR-0001), IKKE codecarbons egne per-kilde-faktorer. Begrunnelse: (a) intern konsistens — samme tall i codecarbon som i Khepris DOI-artefakt, ellers to ulike NO4-tall i omløp og brutt reproduserbarhet; (b) IPCC AR5 er sitert/fagfellevurdert standard (CarbonCast/EnsembleCI-konvensjon), mens codecarbons egen tabell er metodisk blandet (direkte fossil + WNA-livssyklus). PR-en forklarer avviket fra codecarbons carbon_intensity_per_source.json eksplisitt og forsvarer IPCC AR5 som konsistent basis.
+### 1. Factor basis: IPCC AR5, inherited from ADR-0001
+The PR uses Khepri's IPCC AR5 lifecycle medians (ADR-0001), NOT codecarbon's own
+per-source factors. Rationale: (a) internal consistency — the same figures in
+codecarbon as in Khepri's DOI artefact; otherwise two different NO4 values exist in
+the wild and reproducibility is broken; (b) IPCC AR5 is a cited/peer-reviewed
+standard (CarbonCast/EnsembleCI convention), whereas codecarbon's own table is
+methodologically mixed (direct fossil + WNA lifecycle). The PR explains the
+divergence from codecarbon's carbon_intensity_per_source.json explicitly and
+defends IPCC AR5 as a consistent basis.
 
-### 2. Hvilke verdier, hvilken periode
-Per-sone årssnitt-CI, produksjonsbasert, fra det mest komplette tilgjengelige året (2025) med ADR-0001+0002-metoden. Verdier: NO1, NO2, NO3, NO4, NO5 som beregnet (ikke gjengitt her fra minne — PR henter dem fra Khepris committede output, B1).
+### 2. Which values, which period
+Per-zone annual-mean CI, production-based, from the most complete available year
+(2025) using the ADR-0001+0002 method. Values: NO1, NO2, NO3, NO4, NO5 as
+computed (not stated from memory — the PR fetches them from Khepri's committed
+output, B1).
 
-### 3. Drift-karakteristikk MÅ følge med (ærlighet over ren erstatning)
-PR-en dumper ikke bare fem tall. Metadata/notes per sone bærer drift-funnet (ADR-0003) og forecast-funnet (ADR-0004):
-- NO1/NO2/NO3: stabile år-til-år (<5%), årlig oppdatering tilstrekkelig.
-- NO4: hendelses-drevet variabilitet (Hammerfest LNG driftsstans 2020-2022, dokumentert) — verdien er periodeavhengig, ikke en stabil konstant. Flagges eksplisitt.
-- NO5: produksjonsbasert CI nær matematisk låst til hydro-faktor i rene vannkraft-perioder.
-- Ærlig grense oppgis: produksjonsbasert NO-CI er lav og lite distinkt mellom soner unntatt der fossil gass forekommer (NO4).
+### 3. Drift characterisation MUST accompany the values (honesty over bare replacement)
+The PR does not simply drop five figures. Metadata/notes per zone carry the drift
+finding (ADR-0003) and forecast finding (ADR-0004):
+- NO1/NO2/NO3: stable year-over-year (<5%); annual update is sufficient.
+- NO4: event-driven variability (Hammerfest LNG outage 2020-2022, documented) —
+  the value is period-dependent, not a stable constant. Flagged explicitly.
+- NO5: production-based CI near the hydro lifecycle floor (~24) in pure-hydropower
+  periods.
+- Honest limit stated: production-based NO CI is low and not very distinct between
+  zones except where fossil gas occurs (NO4).
 
-### 4. Metodisk transparens i PR
-PR-en oppgir eksplisitt: (a) at dette erstatter produksjons-fallbacken, ikke Electricity Maps consumption-based primær-stien; (b) kilde (ENTSO-E + IPCC AR5, lenke til Khepri DOI når frosset); (c) at metoden er produksjonsbasert generasjonsmiks (matcher codecarbons egen fallback-metodikk); (d) reproduserbarhet (Khepri-repo, ADR-kjede).
+### 4. Methodological transparency in the PR
+The PR states explicitly: (a) that this replaces the production fallback, not the
+Electricity Maps consumption-based primary path; (b) source (ENTSO-E + IPCC AR5,
+link to Khepri DOI once frozen); (c) that the method is production-based
+generation-mix (matches codecarbon's own fallback methodology); (d)
+reproducibility (Khepri repo, ADR chain).
 
-### 5. Direkte PR (presedens-forankret)
-codecarbon-recon viste presedens for eksterne direkte faktor-PR-er (#1039, #1224 begge merget). PR sendes direkte, ikke issue-først. MEN rett før innsending: forbigåelse-sjekk (gh pr list + issue list --search "Norway"/"NO1"/"nordic"/"emission factor" — har noen åpnet noe siden recon?) og verifiser at PR-en ikke kolliderer med pågående arbeid. PR-body forklarer forbedringen fyldig (som et issue ville), siden det ikke er et forutgående issue å lene seg på.
+### 5. Direct PR (precedent-grounded)
+codecarbon recon showed precedent for external direct factor PRs (#1039, #1224,
+both merged). PR sent directly, no prior issue. BUT immediately before submission:
+forbigåelse check (gh pr list + issue list --search "Norway"/"NO1"/"nordic"/
+"emission factor" — has anyone opened anything since recon?) and verify the PR
+does not collide with ongoing work. The PR body explains the improvement fully
+(as an issue would), since there is no prior issue to lean on.
 
-## Konsekvenser
-- Hullet fylles ved kilden: norske codecarbon-brukere får per-sone-tall istedenfor uniform 18.0 (som er for lav for alle, 2.5x for lav for NO4).
-- Khepri blir sitert kilde i et bredt brukt verktøy — adopsjon, ikke bare publisering.
-- Drift-karakteristikken gjør PR-en ansvarlig: brukere vet hvilke soner som er stabile og hvilke som krever oppdatering.
-- Avvik fra codecarbons egen faktortabell må forsvares i review — akseptert kostnad for konsistens med Khepris DOI-artefakt.
+## Consequences
+- The gap is filled at source: Norwegian codecarbon users get per-zone figures
+  instead of a uniform 18.0 (which is too low for all, 2.5× too low for NO4).
+- Khepri becomes a cited source in a widely used tool — adoption, not just
+  publication.
+- The drift characterisation makes the PR accountable: users know which zones are
+  stable and which require updates.
+- Divergence from codecarbon's own factor table must be defended in review —
+  accepted cost for consistency with Khepri's DOI artefact.
 
-## Alternativer vurdert
-- Faktor-basis B (rekompute med codecarbons egne faktorer): forkastet — ville gitt to ulike NO-tall (codecarbon vs Khepri DOI), brutt reproduserbarhet, og bundet oss til codecarbons metodisk blandede tabell.
-- Ren tall-erstatning uten drift-metadata: forkastet — uærlig mot det drift/forecast-lagene påviste; en statisk NO4-verdi ville villede.
-- Vente til DOI-frys før PR: vurdert — PR kan åpnes med lenke til Khepri-repo nå, DOI legges til når frosset. Ikke en blokker, men PR bør referere det kommende DOI-ankeret.
+## Alternatives considered
+- Factor basis B (recompute with codecarbon's own factors): rejected — would
+  produce two different NO values (codecarbon vs Khepri DOI), break
+  reproducibility, and tie us to codecarbon's methodologically mixed table.
+- Bare value replacement without drift metadata: rejected — dishonest about what
+  the drift/forecast layers found; a static NO4 value would mislead.
+- Wait for DOI freeze before the PR: considered — the PR can be opened with a link
+  to the Khepri repo now, the DOI added once frozen. Not a blocker, but the PR
+  should reference the forthcoming DOI anchor.
 
-## Avhengighet
-Adopsjon (denne) bygger på datakjerne+drift+forecast (alle ✅). Frys (Fase 5) er separat: DOI-frys av Khepri-artefaktet styrker PR-en (sitérbart anker) men blokkerer den ikke.
+## Dependency
+Adoption (this ADR) builds on data-core + drift + forecast (all complete). Freeze
+(Phase 5) is separate: DOI freeze of the Khepri artefact strengthens the PR
+(citable anchor) but does not block it.

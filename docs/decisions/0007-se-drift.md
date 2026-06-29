@@ -1,23 +1,37 @@
-# ADR-0007: SE per-sone drift — arv av ADR-0003-metode
+# ADR-0007: SE per-zone drift — inheritance of the ADR-0003 method
 
-Status: Vedtatt
-Dato: 2026-06-29
-Bygger på: ADR-0003 (drift), ADR-0006 (SE per-sone CI)
+Status: Accepted
+Date: 2026-06-29
+Builds on: ADR-0003 (drift), ADR-0006 (SE per-zone CI)
 
-## Kontekst
-SE per-sone CI (SE1-SE4, ADR-0006) er beregnet for 2022-2025. Drift-laget karakteriserer år-til-år-stabilitet per sone med samme metode som NO (ADR-0003). 2021 er ekskludert (dekning 4,7 %, ~2 uker data); effektivt vindu 2022-2025.
+## Context
+SE per-zone CI (SE1-SE4, ADR-0006) has been computed for 2022-2025. The drift
+layer characterises year-over-year stability per zone using the same method as NO
+(ADR-0003). 2021 is excluded (coverage 4.7%, approximately two weeks of data);
+effective window 2022-2025.
 
-## Beslutning: arv ADR-0003-drift-metode uendret, pre-registrert terskel
+## Decision: inherit the ADR-0003 drift method unchanged, pre-registered threshold
 
-### 1. Metode og terskel arvet fra ADR-0003 (pre-registrert proveniens)
-Drift-metoden (drift.py) brukes uendret. Materialitetsterskel er arvet fra ADR-0003, satt for NO FØR noen SE-data eksisterte: >15 % år-til-år CI-endring ELLER >5pp miks-andel-skift for materiell type = materiell drift. Terskelen er IKKE valgt for å passe SE-tall — dens proveniens er ADR-0003 (NO), forut for all SE-data. Den anvendes på SE uten justering. Grensetilfeller (verdier rett over terskel) rapporteres som materiell drift mot den forhåndssatte terskelen, ikke bortjustert fordi de er nære.
+### 1. Method and threshold inherited from ADR-0003 (pre-registered provenance)
+The drift method (drift.py) is used unchanged. The materiality threshold is
+inherited from ADR-0003, set for NO BEFORE any SE data existed: > 15%
+year-over-year CI change OR > 5 pp mix-share shift for a material type (material
+per ADR-0002) = material drift. The threshold is NOT chosen to fit SE figures —
+its provenance is ADR-0003 (NO), prior to all SE data. It is applied to SE without
+adjustment. Borderline cases (values just above the threshold) are reported as
+material drift against the pre-set threshold, not smoothed away because they are
+close.
 
-### 2. Test-vindu
-2022 vs 2025 per sone mot terskel; år-til-år-endringer rapporteres for hele 2022-2025. 2021 ekskludert (dekning).
+### 2. Test window
+2022 vs 2025 per zone against threshold; year-over-year changes reported for the
+full 2022-2025 span. 2021 excluded (coverage).
 
-### 3. SE-spesifikt forbehold (B3)
-2021 ekskludert (4,7 % dekning). SE har ikke NOs energikrise-spesifikke 2021-2022-regimeskift målbart i dette vinduet, siden 2021 mangler. Drift-karakteriseringen gjelder 2022-2025.
+### 3. SE-specific caveat (B3)
+2021 excluded (4.7% coverage). SE does not have the energy-crisis-specific
+2021-2022 regime shift measurable in this window, since 2021 is absent. The drift
+characterisation applies to 2022-2025.
 
-## Konsekvenser
-- Per-sone oppdateringsfrekvens for codecarbon-bidraget informeres av drift: stabile soner trenger sjeldnere oppdatering enn driftende.
-- Samme ADR-kjede, reproduserbarhet og DOI-disiplin som NO.
+## Consequences
+- Per-zone update frequency for the codecarbon contribution is informed by drift:
+  stable zones require less frequent updates than drifting ones.
+- Same ADR chain, reproducibility, and DOI discipline as NO.

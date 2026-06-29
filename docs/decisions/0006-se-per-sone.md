@@ -1,38 +1,70 @@
-# ADR-0006: SE per-sone CI — utvidelse av Khepri-metoden til svenske budområder
+# ADR-0006: SE per-zone CI — extension of the Khepri method to Swedish bidding zones
 
-Status: Vedtatt
-Dato: 2026-06-29
-Bygger på: ADR-0001, ADR-0002, ADR-0003, ADR-0004, ADR-0005
+Status: Accepted
+Date: 2026-06-29
+Builds on: ADR-0001, ADR-0002, ADR-0003, ADR-0004, ADR-0005
 
-## Kontekst
-Khepri-metoden (NO1-NO5) utvides til de svenske budområdene SE1-SE4. codecarbon har samme placeholder-defekt for SE som NO hadde: SE1-SE4 alle 18,0 gCO2eq/kWh uniform (verifisert mot nordic_emissions.json). CarbonCast/EnsembleCI dekker SE kun som land-aggregat (verifisert mot deres data/-kataloger — én SE/, ingen SE1-4), så per-sone SE er genuint nytt. Forbigåelse ren: ingen åpen SE per-sone CI-issue/PR i CarbonCast, EnsembleCI eller codecarbon.
+## Context
+The Khepri method (NO1-NO5) is extended to the Swedish bidding zones SE1-SE4.
+codecarbon has the same placeholder defect for SE as it had for NO: SE1-SE4 all
+18.0 gCO2eq/kWh uniform (verified against nordic_emissions.json). CarbonCast/
+EnsembleCI cover SE only as a country aggregate (verified against their data/
+directories — one SE/, no SE1-4), so per-zone SE is genuinely new. Forbigåelse
+check clean: no open SE per-zone CI issue/PR in CarbonCast, EnsembleCI or
+codecarbon.
 
-## Beslutning: arv uendret metode, noter det SE-spesifikke
+## Decision: inherit the unchanged method, note the SE-specific aspects
 
-### 1. Metode arvet uendret fra ADR-0001 + ADR-0002
-SE1-SE4 CI beregnes med NØYAKTIG samme ci.py-pipeline som NO: produksjonsbasert generasjonsmiks × IPCC AR5 lifecycle-faktorer, varighet-vektet aggregering, NaN-eksklusjon, materialitetsterskel (0,5% miks / 5 MW). Ingen metodeendring. Drift (ADR-0003) og forecast (ADR-0004) arves likeså.
+### 1. Method inherited unchanged from ADR-0001 + ADR-0002
+SE1-SE4 CI is computed with the EXACT same ci.py pipeline as NO: production-based
+generation-mix × IPCC AR5 lifecycle factors, duration-weighted aggregation, NaN
+exclusion, materiality threshold (0.5% mix / 5 MW). No method change. Drift
+(ADR-0003) and forecast (ADR-0004) are inherited likewise.
 
-### 2. EIC-koder (verifisert mot entsoe-py, ikke antatt)
-SE1 10Y1001A1001A44P · SE2 10Y1001A1001A45N · SE3 10Y1001A1001A46L · SE4 10Y1001A1001A47J.
-NB: 10YSE-1 er land-AGGREGATET, ikke per-sone — bekreftet og forkastet. Per-sone-koderne over er autoritative.
+### 2. EIC codes (verified against entsoe-py, not assumed)
+SE1 10Y1001A1001A44P · SE2 10Y1001A1001A45N · SE3 10Y1001A1001A46L · SE4
+10Y1001A1001A47J. NB: 10YSE-1 is the country AGGREGATE, not per-zone — confirmed
+and rejected. The per-zone codes above are authoritative.
 
-### 3. Kjernekraft (nytt mot NO, AR5-verifisert)
-SE har produksjonstypen Nuclear (B14), fraværende i NO. Faktor = 12 gCO2eq/kWh (IPCC AR5 Annex III median, samme sekundærkilde som ADR-0001 — kryssjekket konsistent). Kjernekraft ble observert KUN i SE3 (døgn 2026-06-27), ikke SE1/SE2/SE4. SE3-eksklusivitet forventes strukturelt og bekreftes empirisk i datakjerne-kjøringen over fullt vindu (2021-2025) — det er der per-sone-variasjonens størrelse faktisk kvantifiseres, ikke i denne ADR-en. (Den observerte verdien var produksjon 2026-06-27, ikke installert kapasitet.) Kjernekraft i SE3 forventes å være hovedkilden til per-sone-variasjon — i kontrast til NO der variasjonen var gass-drevet (NO4) og ellers lav.
+### 3. Nuclear power (new relative to NO, AR5-verified)
+SE has production type Nuclear (B14), absent in NO. Factor = 12 gCO2eq/kWh (IPCC
+AR5 Annex III median, same secondary source as ADR-0001 — cross-checked
+consistent). Nuclear was observed ONLY in SE3 (2026-06-27 intraday), not in
+SE1/SE2/SE4. SE3 exclusivity is expected structurally and confirmed empirically in
+the data-core run over the full window (2021-2025) — that is where the size of the
+per-zone variation is quantified, not in this ADR. (The observed value was
+production on 2026-06-27, not installed capacity.) Nuclear in SE3 is expected to
+be the primary source of per-zone variation — in contrast to NO where variation was
+gas-driven (NO4) and otherwise low.
 
-### 4. psrType-forbehold (B3, eksplisitt)
-Det verifiserte psrType-settet er fra ett døgn (2026-06-27). Sjeldne typer (Waste, Biomass) som ikke produserte det døgnet kan forekomme i full årsdata. Disse dekkes automatisk av eksisterende factors.py-mekanisme (AR5-faktor eller EXCLUDED/SENSITIVITY_PROXY for under-materielle typer). SE har IKKE bare de seks typene observert ett døgn — full datakjerne-kjøring avdekker det faktiske settet, og metoden håndterer nye typer uten endring.
+### 4. psrType caveat (B3, explicit)
+The verified psrType set is from one intraday period (2026-06-27). Rare types
+(Waste, Biomass) that were not producing that day may appear in the full annual
+data. These are handled automatically by the existing factors.py mechanism (AR5
+factor or EXCLUDED/SENSITIVITY_PROXY for below-material types). SE does NOT have
+only the six types observed on one day — the full data-core run reveals the actual
+set, and the method handles new types without change.
 
-### 5. Bidrag — ærlig posisjonering (B3)
-- Datakjerne + drift per-sone SE1-SE4: genuint nytt (ingen har per-sone, kun aggregat).
-- Forecast: claimes som "første per-budområde SE1-SE4 CI-forecast", ALDRI som "første SE CI-forecast" (CarbonCast har SE-aggregat). Per-sone er det som gjør det nytt.
-- codecarbon-fylling: reelt uavhengig av forecasting (placeholder er like gal for SE).
+### 5. Contribution — honest positioning (B3)
+- Data-core + per-zone drift SE1-SE4: genuinely new (no one has per-zone, only
+  aggregate).
+- Forecast: claimed as "first per-bidding-zone SE1-SE4 CI forecast", NEVER as
+  "first SE CI forecast" (CarbonCast has SE aggregate). Per-zone granularity is
+  what is new.
+- codecarbon gap-fill: genuinely independent of forecasting (the placeholder is
+  equally wrong for SE).
 
-## Konsekvenser
-- SE-artefaktet kan bli sterkere enn NO på forecast-leddet: SE3-kjernekraft gir reell per-sone-variasjon å forutsi, der NO var lavt/lite distinkt.
-- Samme reproduserbarhet, ADR-kjede, DOI-disiplin som NO.
-- Egen codecarbon-PR (parallell til #1260) for SE1-SE4.
+## Consequences
+- The SE artefact may be stronger than NO on the forecast layer: SE3 nuclear
+  provides real per-zone variation to forecast, whereas NO was low and not very
+  distinct.
+- Same reproducibility, ADR chain, DOI discipline as NO.
+- Separate codecarbon PR (parallel to #1260) for SE1-SE4.
 
-## Alternativer vurdert
-- Anta 10YSE-1: forkastet — det er aggregatet, ville kollapset per-sone-claimet (gaten fanget dette).
-- Ny faktor for kjernekraft: forkastet — AR5-verdien (12) er allerede i factors.py og konsistent; ingen grunn til avvik.
-- Bare codecarbon-fylling uten drift/forecast: forkastet — per-sone drift + forecast er det genuint nye bidraget feltet mangler.
+## Alternatives considered
+- Assume 10YSE-1: rejected — that is the aggregate, which would collapse the
+  per-zone claim (the gate caught this).
+- New factor for nuclear: rejected — the AR5 value (12) is already in factors.py
+  and consistent; no reason to deviate.
+- codecarbon gap-fill only, without drift/forecast: rejected — per-zone drift +
+  forecast is the genuinely new contribution the field lacks.

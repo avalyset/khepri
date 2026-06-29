@@ -1,35 +1,59 @@
-# ADR-0003: Drift-måling i CI-signalet
+# ADR-0003: Drift measurement in the CI signal
 
-Status: Vedtatt
-Dato: 2026-06-29
-Bygger på: ADR-0001, ADR-0002
+Status: Accepted
+Date: 2026-06-29
+Builds on: ADR-0001, ADR-0002
 
-## Kontekst
-Khepris adopsjonslag (codecarbon-integrasjon) krever å vite om et CI-tall beregnet på ett år er gyldig for neste, eller om den norske kraftmiksen driver nok til at signalet forfaller og må retrenes. Dette måles på det produksjonsbaserte CI-signalet (ADR-0001+0002-metoden) over 2021–H1.2026 per NO-sone. Pre-registreringen låses før drift-resultatet ses.
+## Context
+Khepri's adoption layer (codecarbon integration) needs to know whether a CI figure
+computed for one year is valid for the next, or whether the Norwegian generation mix
+drifts enough that the signal decays and must be retrained. This is measured on the
+production-based CI signal (ADR-0001+0002 method) over 2021–H1 2026 per NO zone.
+Pre-registration is locked before the drift result is observed.
 
-## Pre-registrerte beslutninger (låst før resultat)
+## Pre-registered decisions (locked before result)
 
-### 1. Drift-metrikk
-- Primær: årlig CI per sone, beregnet med NØYAKTIG ADR-0001+0002-pipeline per år (samme faktorer, NaN-eksklusjon, varighet-vekting, materialitetsterskel). År-til-år endring i prosent.
-- Sekundær: miks-andel per psrType per år, år-til-år drift i prosentpoeng.
+### 1. Drift metric
+- Primary: annual CI per zone, computed with the EXACT ADR-0001+0002 pipeline per
+  year (same factors, NaN exclusion, duration-weighting, materiality threshold).
+  Year-over-year change in percent.
+- Secondary: mix share per psrType per year, year-over-year drift in percentage
+  points.
 
-### 2. Terskel for materiell drift (pre-registrert)
-- År-til-år CI-endring > 15 % ELLER miks-andel-skift > 5 prosentpoeng for en materiell type (materiell per ADR-0002: ≥0,5 % miks eller ≥5 MW) regnes som materiell drift.
-- Begrunnelse: under denne terskelen er et fjorårs-CI-tall brukbart som proxy for inneværende år (adopsjons-relevant: oppdateringsfrekvens kan være årlig). Over terskelen er det ikke, og hyppigere retrening kreves.
+### 2. Threshold for material drift (pre-registered)
+- Year-over-year CI change > 15% OR mix-share shift > 5 percentage points for a
+  material type (material per ADR-0002: ≥ 0.5% mix or ≥ 5 MW) counts as material
+  drift.
+- Rationale: below this threshold a prior-year CI figure is usable as a proxy for
+  the current year (adoption-relevant: update frequency can be annual). Above it,
+  that is no longer true and more frequent retraining is required.
 
-### 3. Regime-test (energikrise 2021-2022)
-- Test om 2021-2022 er statistisk distinkt fra 2023-2026 per sone: sammenlign årssnitt-CI og miks-andeler. Flagg om krise-årene avviker > terskel (beslutning 2) fra det senere regimet.
-- Pre-spesifisert: dette er en deskriptiv regime-sammenligning, ikke en hypotesetest med p-verdi — vi rapporterer størrelsen på forskjellen mot terskel, ikke signifikans.
+### 3. Regime test (energy crisis 2021-2022)
+- Test whether 2021-2022 is statistically distinct from 2023-2026 per zone: compare
+  annual-mean CI and mix shares. Flag if crisis years deviate > threshold (Decision
+  2) from the later regime.
+- Pre-specified: this is a descriptive regime comparison, not a hypothesis test with
+  p-value — we report the size of the difference against the threshold, not
+  significance.
 
-### 4. Null-hypotese (eksplisitt)
-- H0: norsk per-sone CI er stabilt år-til-år (vannkraft-dominert → lav drift, fjorårs-tall er god proxy).
-- Vi tester om H0 holder. Vi forventer IKKE et bestemt utfall. Et stabilt signal og et driftende signal er begge ekte, publiserbare funn med ulik konsekvens for adopsjonslagets oppdateringsfrekvens.
+### 4. Null hypothesis (explicit)
+- H0: Norwegian per-zone CI is stable year-over-year (hydro-dominated → low drift,
+  prior-year figures are a good proxy).
+- We test whether H0 holds. We do NOT expect a particular outcome. A stable signal
+  and a drifting signal are both genuine, publishable findings with different
+  consequences for the adoption layer's update frequency.
 
-## Konsekvenser
-- Stabilt signal (drift < terskel): fjorårs-CI er god proxy; codecarbon-integrasjonen kan oppdateres årlig.
-- Driftende signal (drift > terskel): signalet forfaller; hyppigere retrening kreves, og dette må dokumenteres i adopsjons-leveransen.
-- NO4-gass-andel måles per år som del av miks-drift (driver vi vet er der; vi måler utviklingen, jakter den ikke).
+## Consequences
+- Stable signal (drift < threshold): prior-year CI is a good proxy; the codecarbon
+  integration can be updated annually.
+- Drifting signal (drift > threshold): the signal decays; more frequent retraining
+  is required, and this must be documented in the adoption deliverable.
+- NO4 gas share is measured per year as part of mix drift (a driver we know is
+  present; we measure its evolution, not hunt for it).
 
-## Alternativer vurdert
-- Lavere terskel (5 %): forkastet, fanger sesong-/værstøy som ikke er reell strukturell drift.
-- Hypotesetest med p-verdi på regime: forkastet, vi har hele populasjonen (alle intervaller), ikke et utvalg — effektstørrelse mot terskel er riktigere enn signifikans.
+## Alternatives considered
+- Lower threshold (5%): rejected — captures seasonal/weather noise that is not real
+  structural drift.
+- Hypothesis test with p-value on regime: rejected — we have the full population
+  (all intervals), not a sample; effect size against threshold is more appropriate
+  than significance.

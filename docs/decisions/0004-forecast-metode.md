@@ -1,54 +1,101 @@
-# ADR-0004: Forecast-metode for per-sone CI
+# ADR-0004: Forecast method for per-zone CI
 
-Status: Vedtatt
-Dato: 2026-06-29
-Bygger på: ADR-0001, ADR-0002, ADR-0003
+Status: Accepted
+Date: 2026-06-29
+Builds on: ADR-0001, ADR-0002, ADR-0003
 
-## Kontekst
-Adopsjonslaget (karbon-bevisst scheduling) trenger multi-døgns per-sone CI-prognose. Feltets eval-konvensjon er hentet fra primærkilder (CarbonCast BuildSys 2022, EnsembleCI arXiv 2505.01959, LiteCast arXiv 2511.06187) og styrer beslutning 2 og 4 — vi matcher feltet for sammenlignbarhet, ikke egen gjetting. NO er fraværende i alle tre (fil-belagt) — dette er bidraget.
+## Context
+The adoption layer (carbon-aware scheduling) needs a multi-day per-zone CI forecast.
+The field's evaluation convention is drawn from primary sources (CarbonCast BuildSys
+2022, EnsembleCI arXiv 2505.01959, LiteCast arXiv 2511.06187) and governs Decisions
+2 and 4 — we match the field for comparability, not our own guessing. NO is absent
+from all three (file-verified) — this is the contribution.
 
-## Pre-registrerte beslutninger (låst før resultat)
+## Pre-registered decisions (locked before result)
 
-### 1. Prognose-mål
-- Per sone (NO1–NO5), CI (gCO2eq/kWh, ADR-0001+0002-metoden), horisont 96 timer dag-vis (dag-1: 0-24t ... dag-4: 72-96t), timeoppløsning. Matcher CarbonCast/EnsembleCI-konvensjonen eksakt.
-- Sliding-window (24t inn → neste 24t), snitt av 3 kjøringer for stokastiske modeller (CarbonCast §4.1-konvensjon). Deterministiske modeller (persistens, SARIMA): 1 kjøring.
+### 1. Forecast target
+- Per zone (NO1–NO5), CI (gCO2eq/kWh, ADR-0001+0002 method), horizon 96 hours
+  day-wise (day-1: 0-24h ... day-4: 72-96h), hourly resolution. Matches
+  CarbonCast/EnsembleCI convention exactly.
+- Sliding window (24h in → next 24h), mean of 3 runs for stochastic models
+  (CarbonCast §4.1 convention). Deterministic models (persistence, SARIMA): 1 run.
 
-### 2. Baseliner (feltets faktiske benchmark, ikke gjetting)
-- Primær baseline å slå: **SARIMA** (Seasonal-ARIMA) — CarbonCasts egen SOTA-baseline (SOTA₁).
-- Persistens inkluderes som gulv (LiteCast-presedens), ikke som hovedbaseline.
-- Hvis CarbonCast-implementasjon kjørbar på NO-data: rapporter mot den som de-facto SOTA. Hvis ikke (akademisk repo, frosset main — jf. recon): SARIMA + persistens er ærlig benchmark, og fraværet av kjørbar CarbonCast-NO dokumenteres.
-- B3: en forecast som ikke slår SARIMA er ikke et bidrag, rapporteres rett.
+### 2. Baselines (the field's actual benchmark, not guessing)
+- Primary baseline to beat: **SARIMA** (Seasonal-ARIMA) — CarbonCast's own
+  SOTA baseline (SOTA₁).
+- Persistence included as floor (LiteCast precedent), not as primary baseline.
+- If CarbonCast implementation is runnable on NO data: report against it as
+  de-facto SOTA. If not (academic repo, frozen main — per recon): SARIMA +
+  persistence is an honest benchmark, and the absence of a runnable CarbonCast-NO
+  is documented.
+- B3: a forecast that does not beat SARIMA is not a contribution; reported straight.
 
-### 3. Modell-tilnærming
-- Kompleksitet low→high, låst rekkefølge: SARIMA-baseline først, så evt. ML (gradient-boosting, jf. EnsembleCI LightGBM/CatBoost) kun hvis enkel modell dokumentert utilstrekkelig. Ikke hopp til tung modell uten at enklere er prøvd og rapportert.
-- Predikere generation-per-type→avled CI, eller CI direkte: begge tillatt, rapporter hvilken og hvorfor.
+### 3. Model approach
+- Complexity low→high, locked order: SARIMA baseline first, then ML (gradient
+  boosting, cf. EnsembleCI LightGBM/CatBoost) only if the simple model is
+  documented as insufficient. Do not jump to a heavy model before the simpler one
+  has been tried and reported.
+- Predict generation-per-type→derive CI, or CI directly: both permitted; report
+  which and why.
 
-### 4. Metrikk (forankret i felt + lav-CI-supplement)
-- Primær: **MAPE** (mean/median/90./95.-persentil) — feltets standard, direkte sammenlignbar med CarbonCasts SE-tall (5,78 % livssyklus / 10,07 % direkte), nærmeste publiserte lav-CI-vannkraft-parallell.
-- Supplement (pre-registrert, ikke post-hoc): **MAE + RMSE**, fordi norsk CI er lavt (~20-40) og MAPE er dokumentert ustabil i lav/volatile regimer (LiteCast: opptil 49 % Danmark). Begrunnelse forankret i LiteCast, ikke gjetting.
-- Ranking-metrikk (**concordance-index**, LiteCast): rapporteres for scheduling-relevans (rett rekkefølge av rene/skitne timer betyr mer for adopsjon enn absolutt feil).
-- Per sone, per dag-horisont (dag 1-4).
+### 4. Metrics (anchored in the field + low-CI supplement)
+- Primary: **MAPE** (mean/median/90th/95th percentile) — the field's standard,
+  directly comparable with CarbonCast's SE figures (5.78% lifecycle / 10.07%
+  direct), the nearest published low-CI hydropower parallel.
+- Supplement (pre-registered, not post-hoc): **MAE + RMSE**, because Norwegian CI
+  is low (~20-40) and MAPE is documented as unstable in low/volatile regimes
+  (LiteCast: up to 49% for Denmark). Rationale anchored in LiteCast, not guessing.
+- Ranking metric (**concordance index**, LiteCast): reported for scheduling
+  relevance (getting the order of clean/dirty hours right matters more for adoption
+  than absolute error).
+- Per zone, per day-horizon (days 1-4).
 
-### 5. Split (DOBBEL: drift-bevisst primær + felt-eksakt sekundær)
+### 5. Split (DOUBLE: drift-aware primary + field-exact secondary)
 
-**PRIMÆR (drift-bevisst):** train 2021-2023, validér 2024, test 2025; H1-2026 urørt slutt-test. Rapporter forecast-skill SEPARAT for drift-soner (NO4/NO5) vs stabile (NO1/NO2/NO3). Test eksplisitt om modellen fanger gass-drevet variasjon eller bare sesong. Begrunnelse: ADR-0003 viste NO4/NO5 strukturell drift post-2021; en pre-drift-test ville evaluere et ikke-representativt regime.
+**PRIMARY (drift-aware):** train 2021-2023, validate 2024, test 2025; H1-2026
+untouched as final holdout. Report forecast skill SEPARATELY for drifting zones
+(NO4/NO5) vs stable (NO1/NO2/NO3). Explicitly test whether the model captures
+gas-driven variation or just seasonality. Rationale: ADR-0003 showed NO4/NO5
+structural drift post-2021; a pre-drift test would evaluate a non-representative
+regime.
 
-**SEKUNDÆR (felt-eksakt comparability-anker):** train 2019–H1 2021, test H2 2021 — replikerer CarbonCast/EnsembleCI eksakt for ett direkte-sammenlignbart MAPE-tall mot deres SE-tall (5,78 livssyklus / 10,07 direkte). Tydelig merket SEKUNDÆR/comparability. NB (verifisert mot data, ikke antatt): NO4 H2-2021 er i Hammerfest-LNG-driftsstansen — anlegget var offline etter brann sept. 2020, restart juni 2022 — så NO4-gass var ~2 MW i 2021 (mot ~194 MW i 2019). Det er IKKE «pre-gass»: gass fantes 2019-2020. H2-2021-tallet er for sammenlignbarhet, ikke drift-evaluering, og NO4 er da i et anomalt lav-gass-vindu (driftsstans), ikke et normalt regime.
+**SECONDARY (field-exact comparability anchor):** train 2019–H1 2021, test H2
+2021 — replicates CarbonCast/EnsembleCI exactly for one directly comparable MAPE
+figure against their SE figures (5.78 lifecycle / 10.07 direct). Clearly labelled
+SECONDARY/comparability. NB (verified against data, not assumed): NO4 H2-2021 is
+within the Hammerfest LNG outage — the plant was offline after the Sept-2020 fire,
+restart June 2022 — so NO4 gas was ~2 MW in 2021 (vs ~194 MW in 2019). This is
+NOT "pre-gas": gas existed 2019-2020. The H2-2021 figure is for comparability, not
+drift evaluation, and NO4 is in an anomalously low-gas window (outage), not a
+normal regime.
 
-Sammenlignbarhet bevares på **metrikk/horisont/format** (MAPE, 96t dag-vis, persentiler), ikke på test-periode. Ingen leakage: testsett røres ikke før endelig evaluering.
+Comparability is preserved on **metric/horizon/format** (MAPE, 96h day-wise,
+percentiles), not on test period. No leakage: the test set is not touched before
+final evaluation.
 
-### 6. Null-hypotese (eksplisitt)
-- H0: en enkel modell slår ikke SARIMA-baselinen meningsfullt for NO-soner (vannkraft-stabilt → lite å forutsi utover sesong).
-- For drift-sonene (NO4/NO5) sekundær H0: ingen modell fanger gass-drevet drift bedre enn sesong.
-- Negativt resultat (sesong/SARIMA er nok) er ekte funn med konsekvens: da trengs ingen tung modell i adopsjonslaget.
+### 6. Null hypothesis (explicit)
+- H0: a simple model does not meaningfully beat the SARIMA baseline for NO zones
+  (hydro-stable → little to predict beyond seasonality).
+- For the drifting zones (NO4/NO5) secondary H0: no model captures gas-driven drift
+  better than seasonality.
+- A negative result (seasonality/SARIMA is sufficient) is a genuine finding with
+  consequences: no heavy model is needed in the adoption layer.
 
-## Konsekvenser
-- Slår modellen baseline: per-sone CI-forecast har operativ scheduling-verdi, går inn i adopsjonslaget.
-- Slår den ikke: SARIMA/sesong er nok, forenkler adopsjon (rapporteres rett).
-- NO blir første publiserte per-sone CI-forecast med feltets eval-konvensjon (CarbonCast-sammenlignbar), fyller det fil-belagte hullet.
+## Consequences
+- Model beats baseline: per-zone CI forecast has operational scheduling value; goes
+  into the adoption layer.
+- Does not beat: SARIMA/seasonality is sufficient, simplifying adoption (reported
+  straight).
+- NO becomes the first published per-zone CI forecast with the field's evaluation
+  convention (CarbonCast-comparable), filling the file-verified gap.
 
-## Alternativer vurdert
-- 48t horisont (tidligere gjetting): forkastet, feltet bruker 96t — sammenlignbarhet krever match.
-- Kun MAPE: forkastet, ustabil i lav-CI-regime (LiteCast-dokumentert); supplert MAE/RMSE/ranking.
-- Kun persistens-baseline: forkastet, ikke feltets benchmark; SARIMA er SOTA-gulvet.
-- H2 2021-test som ENESTE test (eksakt felt-match): forkastet, fanger ikke drift-regimet vårt eget ADR-0003 påviste; brukt som SEKUNDÆR comparability-anker ved siden av primær drift-bevisst split med separat drift-sone-rapportering.
+## Alternatives considered
+- 48h horizon (earlier guess): rejected — the field uses 96h; comparability requires
+  a match.
+- MAPE only: rejected — unstable in the low-CI regime (LiteCast-documented);
+  supplemented with MAE/RMSE/ranking.
+- Persistence baseline only: rejected — not the field's benchmark; SARIMA is the
+  SOTA floor.
+- H2 2021 test as the ONLY test (exact field match): rejected — does not capture
+  the drift regime our own ADR-0003 identified; used as SECONDARY comparability
+  anchor alongside the primary drift-aware split with separate drift-zone reporting.
