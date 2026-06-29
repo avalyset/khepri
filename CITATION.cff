@@ -12,3 +12,13 @@ authors:
     orcid: "https://orcid.org/0009-0001-9188-6788"
 repository-code: "https://github.com/avalyset/khepri"
 license: Apache-2.0
+version: "1.0.0"
+date-released: "2026-06-29"
+doi: 10.5281/zenodo.21042581
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21042581
+    description: Concept DOI (all versions)
+  - type: doi
+    value: 10.5281/zenodo.21042582
+    description: Version 1.0.0

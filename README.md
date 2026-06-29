@@ -1,5 +1,7 @@
 # Khepri
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21042581.svg)](https://doi.org/10.5281/zenodo.21042581)
+
 Når jeg først jobber med AI på mange felt, skulle det bare mangle å bidra her òg.
 
 ## Hva det er
