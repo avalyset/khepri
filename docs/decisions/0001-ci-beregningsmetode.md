@@ -1,93 +1,95 @@
-# ADR-0001: CI-beregningsmetode for norske budområder (NO1–NO5)
+# ADR-0001: CI calculation method for Norwegian bidding zones (NO1–NO5)
 
-- **Status:** Vedtatt
-- **Dato:** 2026-06-29
+- **Status:** Accepted
+- **Date:** 2026-06-29
 
-## Kontekst
+## Context
 
-Vi avleder per-sone karbonintensitet (CI, gCO2eq/kWh) for NO1–NO5 fra ENTSO-E
-Actual Generation per Production Type (A75) og publiserte livssyklus-faktorer.
-Beregningen er aritmetisk, men har fire metodevalg med frihetsgrad. De festes
-**før** beregning, slik at tallene er etterprøvbare og ikke etter-rasjonaliserte.
-Hver faktor og hver datakarakteristikk er verifisert mot navngitt kilde (ikke fra
-hukommelse) — se loggen i § "Verifisering".
+We derive per-zone carbon intensity (CI, gCO2eq/kWh) for NO1–NO5 from ENTSO-E
+Actual Generation per Production Type (A75) and published lifecycle factors.
+The calculation is arithmetic, but involves four method choices with degrees of
+freedom. These are fixed **before** computation, so the numbers are verifiable
+and not post-rationalised.
+Each factor and each data characteristic has been verified against a named source
+(not from memory) — see the log in § "Verification".
 
-## Beslutning 1 — Faktorkilde
+## Decision 1 — Factor source
 
-**IPCC WG3 AR5 Annex III, Table A.III.2** — livssyklus-medianer (gCO2eq/kWh).
-Livssyklus, ikke direkte drift. IPCC-primær-PDF er ikke direkte nåbar fra
-byggemiljøet; verdiene er hentet fra en **sjekkbar sekundærkilde som navngir
-tabellen** (Wikipedia: *Life-cycle greenhouse gas emissions of energy sources*,
-kolonnen som siterer IPCC Annex III Table A.III.2). Dette er eksplisitt en
-sekundærkilde — normal praksis så lenge den navngis. Coal=820 / gas=490 er
-uavhengig bekreftet mot IPCC-dokumentets egen PDF-URL via søk.
+**IPCC WG3 AR5 Annex III, Table A.III.2** — lifecycle medians (gCO2eq/kWh).
+Lifecycle, not direct operation. The IPCC primary PDF is not directly reachable
+from the build environment; values are taken from a **checkable secondary source
+that names the table** (Wikipedia: *Life-cycle greenhouse gas emissions of energy
+sources*, the column citing IPCC Annex III Table A.III.2). This is explicitly a
+secondary source — standard practice as long as it is named. Coal=820 / gas=490
+independently confirmed against the IPCC document's own PDF-URL via search.
 
-Hver faktor er sitert per rad i `src/khepri/factors.py`. Faktortabell (typer som
-faktisk forekommer i NO 2025-data):
+Each factor is cited per row in `src/khepri/factors.py`. Factor table (types
+that actually appear in NO 2025 data):
 
-| Produksjonstype | gCO2eq/kWh | Mapping |
+| Production type | gCO2eq/kWh | Mapping |
 |---|---|---|
-| Fossil Gas | 490 | IPCC 'Gas – combined cycle' (direkte) |
-| Hydro Water Reservoir | 24 | IPCC 'Hydropower' (direkte) |
-| Hydro Run-of-river and poundage | 24 | IPCC 'Hydropower' (én hydro-kategori) |
-| Hydro Pumped Storage | 24 | **PROXY** hydro; fotavtrykk avhenger av ladekilde |
-| Wind Onshore | 11 | IPCC 'Wind onshore' (direkte) |
-| Wind Offshore | 12 | IPCC 'Wind offshore' (direkte) |
-| Solar | 48 | IPCC 'Solar PV – utility' (direkte) |
-| Biomass | 230 | IPCC 'Biomass – dedicated' (direkte) |
+| Fossil Gas | 490 | IPCC 'Gas – combined cycle' (direct) |
+| Hydro Water Reservoir | 24 | IPCC 'Hydropower' (direct) |
+| Hydro Run-of-river and poundage | 24 | IPCC 'Hydropower' (one hydro category) |
+| Hydro Pumped Storage | 24 | **PROXY** hydro; footprint depends on charging source |
+| Wind Onshore | 11 | IPCC 'Wind onshore' (direct) |
+| Wind Offshore | 12 | IPCC 'Wind offshore' (direct) |
+| Solar | 48 | IPCC 'Solar PV – utility' (direct) |
+| Biomass | 230 | IPCC 'Biomass – dedicated' (direct) |
 
-## Beslutning 2 — NaN / manglende data
+## Decision 2 — NaN / missing data
 
-Intervaller med **NaN i en inkludert (faktor-bærende) produksjonstype
-EKSKLUDERES** fra CI-snittet (valg a). NaN ≠ 0. **Dekningsgrad** (% intervaller
-brukt etter eksklusjon) rapporteres som provenans per sone. En type som er
-fraværende i en sone (ikke en kolonne) bidrar med 0, ikke NaN.
+Intervals with **NaN in an included (factor-carrying) production type are
+EXCLUDED** from the CI average (choice a). NaN ≠ 0. **Coverage** (% intervals
+used after exclusion) is reported as provenance per zone. A type that is absent
+in a zone (not a column) contributes 0, not NaN.
 
-**Uverifiserte typer** (Waste, Other, Other renewable) har ingen verifisert faktor
-i den valgte kilden. De **ekskluderes fra primær-CI**, og effekten rapporteres som
-**sensitivitet** (CI med dem inkludert på flaggede proxyer). De gjettes ikke inn i
-primærtallet. Andelen av total energi disse utgjør rapporteres som dekning.
+**Unverified types** (Waste, Other, Other renewable) have no verified factor in
+the chosen source. They are **excluded from primary CI**, and the effect is
+reported as **sensitivity** (CI with them included on flagged proxies). They are
+not guessed into the primary figure. The fraction of total energy they represent
+is reported as coverage.
 
-## Beslutning 3 — Produksjonsbasert
+## Decision 3 — Production-based
 
-CI er **produksjonsbasert**. Import/forbruk er **eksplisitt utelatt**.
-Konsumbasert / flow-traced CI er et separat, senere lag med egen ADR.
+CI is **production-based**. Import/consumption is **explicitly excluded**.
+Consumption-based / flow-traced CI is a separate, later layer with its own ADR.
 
-## Beslutning 4 — Varighet-vektet aggregering
+## Decision 4 — Duration-weighted aggregation
 
-2025-data har **blandet oppløsning** (15-min og 60-min perioder; verifisert på
-disk). CI-snittet vektes på **intervall-VARIGHET** (timer), ikke antall
-intervaller.
+2025 data has **mixed resolution** (15-min and 60-min periods; verified on
+disk). The CI average is weighted by **interval DURATION** (hours), not number
+of intervals.
 
-- CI per intervall: `Σ(MW_type × faktor_type) / Σ(MW_type)`
-- Periode-snitt (energi-vektet): `Σ(MW × faktor × varighet) / Σ(MW × varighet)`
+- CI per interval: `Σ(MW_type × factor_type) / Σ(MW_type)`
+- Period average (energy-weighted): `Σ(MW × factor × duration) / Σ(MW × duration)`
 
-dvs. total utslipp / total energi over rene intervaller.
+i.e. total emissions / total energy over clean intervals.
 
-## Konsekvenser
+## Consequences
 
-- Deterministisk og reproduserbart fra rådata + denne ADR-en.
-- NO-CI blir lav (vannkraft-dominert) og lite distinkt **unntatt NO4**, som har
-  dokumentert fossil gass **år-rundt** (til stede i 98,8 % av 2025-intervallene,
-  alle fire kvartaler) — en strukturell, ikke sesong-, egenskap.
-- Erstatter codecarbons verifiserte uniforme placeholder (18,0 gCO2eq/kWh for alle
-  NO-soner, `nordic_emissions.json`, v3.2.8).
-- Proxy- og uverifiserte typer er eksplisitt flagget; ingen faktor gjettet inn.
+- Deterministic and reproducible from raw data + this ADR.
+- NO CI is low (hydro-dominated) and weakly distinct **except NO4**, which has
+  documented fossil gas **year-round** (present in 98.8% of 2025 intervals,
+  all four quarters) — a structural, not seasonal, property.
+- Replaces codecarbon's verified uniform placeholder (18.0 gCO2eq/kWh for all
+  NO zones, `nordic_emissions.json`, v3.2.8).
+- Proxy and unverified types are explicitly flagged; no factor guessed in.
 
-## Alternativer vurdert (forkastet)
+## Alternatives considered (rejected)
 
-- **Direkte drifts-faktorer** — mindre sammenlignbart med livssyklus-litteraturen.
-- **codecarbons egen faktortabell** — metodisk blandet (direkte fossil + WNA-
-  livssyklus) og mangler biomass + waste; forkastet til fordel for konsistent
-  livssyklus.
-- **Uvektet snitt av intervall-CI** — energi-forvrengende.
-- **Antall-vekting** — feil ved blandet 15-/60-min oppløsning.
-- **NaN = 0** — kunstig; undervurderer ved manglende data.
+- **Direct operation factors** — less comparable with lifecycle literature.
+- **codecarbon's own factor table** — methodologically mixed (direct fossil +
+  WNA lifecycle) and missing biomass + waste; rejected in favour of consistent
+  lifecycle approach.
+- **Unweighted average of interval CI** — energy-distorting.
+- **Count-weighting** — wrong under mixed 15-/60-min resolution.
+- **NaN = 0** — artificial; under-estimates when data is missing.
 
-## Verifisering
+## Verification
 
-- EIC-koder NO1–NO5: identiske med `entsoe.mappings.Area`.
-- psrType→navn: identiske med `entsoe.mappings.PSRTYPE_MAPPINGS`.
-- Placeholder 18,0: lest direkte i installert `codecarbon` v3.2.8
+- EIC codes NO1–NO5: identical to `entsoe.mappings.Area`.
+- psrType→name: identical to `entsoe.mappings.PSRTYPE_MAPPINGS`.
+- Placeholder 18.0: read directly in installed `codecarbon` v3.2.8
   `data/private_infra/nordic_emissions.json`.
-- Faktorer: se `src/khepri/factors.py` med kilde-streng per rad.
+- Factors: see `src/khepri/factors.py` with source string per row.
