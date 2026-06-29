@@ -54,7 +54,9 @@ Et tidligere utkast (commit 1ac6b96, pushet) beskrev NO4 som «Melkøya-gass-ram
 
 ## NO5 — driver identifisert (nærsjekk, R15)
 
-NO5s drift (34,90 → 24,46) er **gass-utfasing — speilbilde av NO4**. Fossil Gas falt 2,33 % (2021) → 0,10 % (2025); ved faktor 490 gir det −10,9 gCO2, som nesten eksakt forklarer CI-fallet på −10,4 gCO2. NO5 konvergerer mot den rene vannkraft-baselinen (~24) etter hvert som gassen fases ut.
+NO5s drift (34,90 → 24,46) er **reell gass-utfasing**. Fossil Gas falt 2,33 % (2021) → 0,10 % (2025); ved faktor 490 gir det −10,9 gCO2, som nesten eksakt forklarer CI-fallet på −10,4 gCO2. NO5 konvergerer mot den rene vannkraft-baselinen (~24) etter hvert som gassen fases ut.
+
+Bekreftet mot 2019-2020-data (samme sanity som avdekket NO4-feilen): NO5-gass var stødig ~80 MW i 2019-2021, så monoton nedgang 2022→2025 (32→7→2 MW). Dette er en **ekte trend**, ikke en 2021-anomali. Begge gass-drevne utliggere har dermed ULIKE mekanismer: NO4 = V-form (branndrevet driftsstans + gjenoppretting), NO5 = monoton utfasing. Det tidligere «speilbilde»-uttrykket var upresist — felles er kun at gass er driveren.
 
 | År | Fossil Gas % | CI | Hydro % | Total (TWh) | Dekning |
 |----|-----:|-----:|-----:|-----:|-----:|
