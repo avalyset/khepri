@@ -30,15 +30,22 @@ Produksjonsbasert CI per sone per år, ADR-0001+0002-pipeline. Terskel (pre-regi
 
 ## NO4 — driveren målt (ikke jaget): gass-andel per år
 
-| År | Fossil Gas % av miks | CI |
-|----|-----:|-----:|
-| 2021 | (ingen gass-kolonne) | 23,34 |
-| 2022 | 3,14 % | 37,67 |
-| 2023 | 4,78 % | 45,08 |
-| 2024 | 6,23 % | 51,46 |
-| 2025 | 3,63 % | 39,65 |
+KORRIGERT med 2019-2020-data (se «Korreksjon» under): driveren er Hammerfest-LNG-driftsstansen, ikke en ny gass-ramp.
 
-NO4s CI følger gasskraften (Melkøya/Hammerfest): fraværende/urapportert 2021, rampet opp 2022–2024 (topp 51,5 ved 6,2 % gass), delvis reversering 2025. Strukturell endring, ikke støy.
+| År | Fossil Gas snitt MW | Fossil Gas % av miks | CI | Hammerfest-LNG-status |
+|----|-----:|-----:|-----:|---|
+| 2019 | 194 | — | (utenfor primær-vindu) | normal drift |
+| 2020 | 124 | — | — | brann sept. 2020 → stans |
+| 2021 | 2 | ~0,07 % | 23,34 | **offline hele året** |
+| 2022 | 111 | 3,14 % | 37,67 | restart 2. juni 2022 |
+| 2023 | 152 | 4,78 % | 45,08 | full drift |
+| 2024 | 168 | 6,23 % | 51,46 | full drift |
+| 2025 | 105 | 3,63 % | 39,65 | drift |
+
+NO4s CI følger Hammerfest LNG (Melkøya) sine gassturbiner. Anlegget stengte etter brann i sept. 2020, var offline ~20 mnd, og restartet 2. juni 2022 ([kilde](https://maritime-executive.com/article/lng-production-resumes-at-hammerfest-20-months-after-fire)). 2021-kollapsen (2 MW) er driftsstansen; «rampen» 2022-2024 er **gjenoppretting etter brannen**, ikke ny vekst.
+
+### Korreksjon (R15 / B3)
+Et tidligere utkast (commit 1ac6b96, pushet) beskrev NO4 som «Melkøya-gass-rampe 2022-24» og 2021 som «ingen gass-kolonne». Begge er feil: gass fantes (~194 MW) i 2019, og 2021-lavpunktet er en branndrevet driftsstans, ikke en baseline. Drift-analysen på 2021-2025 *alene* mistolket 2021-anomalien som utgangspunktet; pre-2021-data avslørte feilen. **Selve drift-tallene (CI per år, H0 forkastet for NO4) står — kun den kausale forklaringen er korrigert: hendelses-drevet driftsstans/gjenoppretting, ikke strukturell vekst.** Konsekvens for forecast: NO4s «drift» er en uforutsigbar industriell hendelse (brann), ikke en glatt trend — vanskeligere å forutsi enn sesong.
 
 ## Verdikt (H0: stabilt signal, fjorårs-CI god proxy)
 
