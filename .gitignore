@@ -1,0 +1,19 @@
+# Hemmeligheter
+.env
+*.token
+*.secret
+
+# Rådata og avledet data (aldri committet — lisens-/størrelse-disiplin)
+raw/
+data/
+*.csv
+*.xml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store

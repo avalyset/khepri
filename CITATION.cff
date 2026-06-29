@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use Khepri, please cite it as below."
+title: Khepri
+abstract: >-
+  Norwegian per-zone (NO1–NO5) carbon intensity signal for carbon-aware
+  computing, derived license-clean and reproducibly from ENTSO-E actual
+  generation per production type and published lifecycle emission factors.
+type: software
+authors:
+  - family-names: "Botten Nicolaysen"
+    given-names: "Eirik"
+    orcid: "https://orcid.org/0009-0001-9188-6788"
+repository-code: "https://github.com/avalyset/khepri"
+license: Apache-2.0
