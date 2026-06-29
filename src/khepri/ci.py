@@ -26,6 +26,13 @@ from .factors import (
 RAW_DIR = os.environ.get("KHEPRI_RAW", os.path.expanduser("~/khepri-data/raw/entsoe-rest"))
 OUT_DIR = os.environ.get("KHEPRI_OUT", os.path.expanduser("~/khepri-data/ci-2025"))
 
+# ADR-0002 — PRE-REGISTRERT materialitetsterskel (satt før re-kjøring, ikke mot dekning).
+# En type er NEGLISJERBAR hvis årssnitt-bidrag < MATERIAL_MIN_SHARE_PCT av sonens
+# totale miks ELLER < MATERIAL_MIN_MW absolutt. NaN i neglisjerbar type -> 0;
+# intervall ekskluderes kun ved NaN i en MATERIELL type.
+MATERIAL_MIN_SHARE_PCT = 0.5
+MATERIAL_MIN_MW = 5.0
+
 
 def ci_of_mix(mw_by_type, factors=FACTORS):
     """Ren funksjon: CI (gCO2eq/kWh) for én øyeblikks-miks. Σ(MW*f)/Σ(MW).
@@ -57,17 +64,30 @@ def _durations_hours(index):
 
 
 def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
-    """Energi-vektet, varighet-korrekt, NaN-ekskludert CI for én sone."""
+    """Energi-vektet, varighet-korrekt, NaN-ekskludert CI for én sone (ADR-0001+0002)."""
     occurring = list(df.columns)
     included = [c for c in occurring if c in factors and c not in excluded]
     missing_factor = [c for c in occurring
                       if c not in factors and c not in excluded]
 
-    dur = _durations_hours(df.index)
-    sub = df[included]
-    clean = sub.notna().all(axis=1)  # NaN i en inkludert type -> drop intervallet
+    # ADR-0002: materialitet per inkludert type (mot pre-registrert terskel).
+    zone_total_mean = float(df[occurring].mean().sum())  # sonens totale miks (snitt MW)
+    material, negligible = [], []
+    for c in included:
+        type_mean = float(df[c].mean())  # snitt over ikke-NaN
+        share_pct = (type_mean / zone_total_mean * 100) if zone_total_mean else 0.0
+        if share_pct >= MATERIAL_MIN_SHARE_PCT and type_mean >= MATERIAL_MIN_MW:
+            material.append(c)
+        else:
+            negligible.append(c)
 
-    g = sub[clean].clip(lower=0)          # MW per inkludert type, rene intervaller
+    dur = _durations_hours(df.index)
+    # Intervall ekskluderes KUN ved NaN i en MATERIELL type.
+    clean = df[material].notna().all(axis=1) if material else df.index.to_series().apply(lambda _: True)
+
+    # NaN i neglisjerbar type -> 0 (ikke datatap); materielle er allerede ikke-NaN her.
+    sub = df[included][clean].fillna(0.0)
+    g = sub.clip(lower=0)                  # MW per inkludert type, rene intervaller
     d = dur[clean]                        # timer
     energy = g.mul(d, axis=0)            # MWh per type
     tot_energy = float(energy.to_numpy().sum())
@@ -93,6 +113,8 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
         "n_clean": int(clean.sum()),
         "coverage_pct": clean.sum() / len(clean) * 100 if len(clean) else float("nan"),
         "included": included,
+        "material": material,
+        "negligible": negligible,
         "missing_factor": missing_factor,
         "included_energy_share_pct": included_share,
         "mix_pct": mix,
