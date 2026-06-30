@@ -55,9 +55,11 @@ set, and the method handles new types without change.
   equally wrong for SE).
 
 ## Consequences
-- The SE artefact may be stronger than NO on the forecast layer: SE3 nuclear
-  provides real per-zone variation to forecast, whereas NO was low and not very
-  distinct.
+- SE3's nuclear share gives real per-zone variation, so the per-zone signal is
+  structurally meaningful — but SE is not stronger than NO: the cross-zone spread
+  (5.6–8.0) is narrower than NO's (16.7–30.7). The magnitude claim was dropped
+  after the data core (see ADR-0008); the SE contribution is granularity (first
+  per-bidding-zone SE), not signal strength.
 - Same reproducibility, ADR chain, DOI discipline as NO.
 - Separate codecarbon PR (parallel to #1260) for SE1-SE4.
 
