@@ -15,7 +15,7 @@ This is the first per-zone NO CI signal with the field's eval convention and doc
 
 ## What it replaces
 
-Tools such as [codecarbon](https://github.com/mlco2/codecarbon) use a **uniform static value of 18.0 gCO2eq/kWh for all Norwegian and Swedish bidding zones** (`nordic_emissions.json`, verified against installed v3.2.8). This is wrong for every zone and in both directions — too low for most zones (**~2.5× too low for NO4**), yet too high for nuclear-dominated SE3 (true CI 14.5) — and it does not distinguish the zones from one another. Khepri produces distinct, source-traceable per-zone values instead.
+Tools such as [codecarbon](https://github.com/mlco2/codecarbon) use a **uniform static value of 18.0 gCO2eq/kWh for all Norwegian and Swedish bidding zones** (`nordic_emissions.json`, verified against installed v3.2.8). This is wrong for every zone and in both directions — too low for most zones (**~2.2× too low for NO4**), yet too high for nuclear-dominated SE3 (true CI 14.5) — and it does not distinguish the zones from one another. Khepri produces distinct, source-traceable per-zone values instead.
 
 **2025 per-zone values (gCO2eq/kWh):**
 
