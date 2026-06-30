@@ -4,41 +4,69 @@
 
 Når jeg først jobber med AI på mange felt, skulle det bare mangle å bidra her òg.
 
-## Hva det er
+## What it is
 
-Et lisens-rent, reproduserbart **per-sone karbonintensitet-signal for de norske budområdene NO1–NO5**, til bruk i karbon-bevisst databehandling — med **ærlig drift- og forecast-karakterisering**, ikke bare fem tall. Karbonintensiteten avledes deterministisk fra:
+A license-clean, reproducible **per-zone carbon-intensity signal for nine Nordic electricity bidding zones — NO1–NO5 and SE1–SE4** — for use in carbon-aware computing, with **honest drift and forecast characterisation**, not just raw numbers. Carbon intensity is derived deterministically from:
 
-- **ENTSO-E** Actual Generation per Production Type (A75), per budområde, og
-- **publiserte livssyklus-utslippsfaktorer** (IPCC AR5 Annex III, sitert).
+- **ENTSO-E** Actual Generation per Production Type (A75), per bidding zone, and
+- **published lifecycle emission factors** (IPCC AR5 Annex III, cited).
 
-Dette er det første per-sone NO CI-signalet med feltets eval-konvensjon og dokumentert drift/forecast-oppførsel — ikke en påstand om at «NO CI-forecasting er løst».
+This is the first per-zone NO CI signal with the field's eval convention and documented drift/forecast behaviour. The SE extension adds the first per-bidding-zone SE1–SE4 CI signal; novelty comes from granularity (zone-level), not signal strength — SE cross-zone spread is 5.6–8.0 gCO2eq/kWh vs NO 16.7–30.7. Neither is claimed stronger than the other.
 
-## Hva det erstatter
+## What it replaces
 
-Verktøy som [codecarbon](https://github.com/mlco2/codecarbon) bruker i dag en **uniform statisk verdi på 18,0 gCO2eq/kWh for alle fem norske budområdene** (`nordic_emissions.json`, verifisert mot installert v3.2.8). Den er for lav for alle sonene og **~2,5× for lav for NO4**, og skiller dem ikke fra hverandre. Khepri produserer distinkte, kildesporbare per-sone-verdier i stedet (2025): NO1 23,3 · NO2 23,9 · NO3 21,5 · NO4 39,6 · NO5 24,5 gCO2eq/kWh.
+Tools such as [codecarbon](https://github.com/mlco2/codecarbon) use a **uniform static value of 18.0 gCO2eq/kWh for all Norwegian and Swedish bidding zones** (`nordic_emissions.json`, verified against installed v3.2.8). This is too low for all zones and **~2.5× too low for NO4**, and it does not distinguish zones from one another. Khepri produces distinct, source-traceable per-zone values instead.
 
-## Lagene (ADR-forankret)
+**2025 per-zone values (gCO2eq/kWh):**
 
-Hver metodevalg er låst i en ADR **før** beregning — etterprøvbart, ikke etter-rasjonalisert.
+| Zone | CI | Note |
+|------|----|------|
+| NO1  | 23.3 | |
+| NO2  | 23.9 | |
+| NO3  | 21.5 | |
+| NO4  | 39.6 | gas-turbine dependent (Hammerfest LNG) |
+| NO5  | 24.5 | |
+| SE1  | 20.6 | |
+| SE2  | 20.1 | |
+| SE3  | 14.5 | nuclear-only; near-zero marginal carbon |
+| SE4  | 17.4 | structurally drifting (ADR-0007) |
 
-1. **Datakjerne** ([ADR-0001](docs/decisions/0001-ci-beregningsmetode.md), [0002](docs/decisions/0002-nan-materialitetsterskel.md)): produksjonsbasert per-sone CI, varighet-vektet, NaN-eksklusjon.
-2. **Drift** ([ADR-0003](docs/decisions/0003-drift-metode.md), [resultat](docs/drift-results-2021-2025.md)): flerårig stabilitet 2021–2025.
-3. **Forecast** ([ADR-0004](docs/decisions/0004-forecast-metode.md), [resultat](docs/forecast-results.md)): 96t per-sone prognose i CarbonCast/EnsembleCI-konvensjon.
-4. **Adopsjon** ([ADR-0005](docs/decisions/0005-adopsjon-codecarbon.md)): integrasjon i codecarbon.
+## Layers (ADR-anchored)
 
-## Hovedfunn (ærlige, ikke seire-pyntet)
+Every method choice is locked in an ADR **before** computation — verifiable, not post-rationalised. Full ADR chain 0001–0008 (English).
 
-- **Drift (2021–2025):** NO1/NO2/NO3 er stabile år-til-år (<5 % → årlig oppdatering nok). NO4 er **hendelses-drevet** — gassturbinene ved Hammerfest LNG var ute etter brann (sept-2020 → restart juni-2022), så NO4-CI er periodeavhengig, ikke en konstant. NO5 viser reell gass-utfasing.
-- **Forecast:** **H0 holder i hovedsak** — enkle baseliner (persistens/SARIMA) er hardt å slå for de stabile sonene; tung ML er ikke trygt bedre (gradient-boosting kollapser på den volatile NO4). NO4s hendelses-sprang forutsies *ikke* (som forventet — en brann ligger ikke i CI-historikken). NOs MAPE ligger i samme rom som CarbonCasts publiserte regioner (SE 5,78).
-- **Ærlig grense:** produksjonsbasert NO-CI er **lav og lite distinkt mellom soner** unntatt der fossil gass forekommer (NO4). NO5s CI er nær matematisk låst til hydro-faktoren (~24) i rene vannkraft-perioder — det er lite forutsigbar informasjon å hente. Konsumbasert/flow-traced lag (import-justert) er **ikke bygget** — en separat, senere beslutning.
+1. **Data core** ([ADR-0001](docs/decisions/0001-ci-beregningsmetode.md), [ADR-0002](docs/decisions/0002-nan-materialitetsterskel.md)): production-based per-zone CI, duration-weighted, NaN exclusion.
+2. **Drift** ([ADR-0003](docs/decisions/0003-drift-metode.md), [NO results](docs/drift-results-2021-2025.md)): multi-year stability 2021–2025.
+3. **Forecast** ([ADR-0004](docs/decisions/0004-forecast-metode.md), [NO results](docs/forecast-results.md)): 96-hour per-zone forecast in the CarbonCast/EnsembleCI convention.
+4. **Adoption** ([ADR-0005](docs/decisions/0005-adopsjon-codecarbon.md)): codecarbon integration.
+5. **SE data core** ([ADR-0006](docs/decisions/0006-se-per-sone.md)): SE1–SE4 CI by the same pipeline; nuclear (B14, 12 gCO2eq/kWh, IPCC AR5) added; SE3 is nuclear-dominant.
+6. **SE drift** ([ADR-0007](docs/decisions/0007-se-drift.md)): SE1/SE2/SE3 stable; SE4 structurally drifting (>15% YoY criterion, pre-registered from ADR-0003). Window 2022–2025 (2021 coverage 4.7%, excluded).
+7. **SE forecast** ([ADR-0008](docs/decisions/0008-se-forecast-method.md), [SE results](docs/se-forecast-results.md)): 96-hour per-zone SARIMA + persistence floor. H0 (heavy ML does not beat simple baselines) **not rejected** — GBM degraded in all four SE zones. SE3 MAPE 4.55%; SE4 20.19% (structural drift, not method failure). SE1/SE2 concordance ~0.58–0.60: level accuracy acceptable, direction tracking limited — noted limitation for scheduling use.
 
-## Lisens (splittet)
+## Key findings (honest, not victory-dressed)
 
-- **Kode:** Apache-2.0 — se [LICENSE](LICENSE).
-- **Data og dokumentasjon:** CC-BY-4.0 — se [LICENSE-DATA](LICENSE-DATA).
+**NO (2021–2025):**
+- NO1/NO2/NO3 are stable year-to-year (<5% → annual update sufficient). NO4 is **event-driven** — gas turbines at Hammerfest LNG were offline after a fire (Sept 2020 → restart June 2022), so NO4 CI is period-dependent, not a constant. NO5 shows real gas phase-out.
+- **Forecast:** H0 holds broadly — simple baselines (persistence/SARIMA) are hard to beat for the stable zones; heavy ML is not safely better (gradient boosting collapses on the volatile NO4). NO4's event-step is not predicted (expected — a fire is not in the CI history). NO MAPE is in the same ballpark as CarbonCast's published regions (SE aggregate 5.78%).
 
-Rådata fra ENTSO-E committes ikke til dette repoet (se `.gitignore`); de hentes reproduserbart via API.
+**SE (2022–2025):**
+- SE1/SE2/SE3 stable; SE4 structurally drifting (pre-registered threshold, ADR-0007 provenance clean).
+- **Forecast H0 not rejected:** SARIMA beats GBM in all four zones. SE3 achieves MAPE 4.55% (nuclear-dominated, low variance); SE4 MAPE 20.19% (drift-driven, not method failure).
+- **Honest SE limit:** SE cross-zone spread is 5.6–8.0 gCO2eq/kWh — narrower than NO. SE1/SE2 concordance ~0.58: direction tracking is limited (scheduling value reduced for those two zones). This is documented, not hidden.
+
+**Shared honest limit:** production-based CI is **not consumption-based** — import/export flow-tracing is not built. A separate, later decision.
+
+## Two-way SE placeholder
+
+The Zenodo artifact (v1.1) includes the nine-zone CI values. A codecarbon PR (ADR-0005) covers the NO zones; SE placeholder correction requires a separate PR — not yet opened. The SE values are citable from this artifact.
+
+## License (split)
+
+- **Code:** Apache-2.0 — see [LICENSE](LICENSE).
+- **Data and documentation:** CC-BY-4.0 — see [LICENSE-DATA](LICENSE-DATA).
+
+Raw ENTSO-E data is not committed to this repo (see `.gitignore`); it is fetched reproducibly via API.
 
 ## Status
 
-Datakjerne + drift + forecast bygget og verifisert (internt + mot ekstern litteratur). Adopsjon (codecarbon-integrasjon) og konsumbasert lag er neste/framtidige steg. Se ADR-ene for hva som faktisk er avgjort og hva som er åpent — ingenting her overselges.
+Data core + drift + forecast built and verified for nine bidding zones (NO1–NO5, SE1–SE4). Adoption (codecarbon integration) covers NO; SE placeholder correction is a future step. Consumption-based layer is not built. See the ADRs for what is actually decided and what is open — nothing here is oversold.

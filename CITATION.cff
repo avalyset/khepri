@@ -2,9 +2,13 @@ cff-version: 1.2.0
 message: "If you use Khepri, please cite it as below."
 title: Khepri
 abstract: >-
-  Norwegian per-zone (NO1–NO5) carbon intensity signal for carbon-aware
-  computing, derived license-clean and reproducibly from ENTSO-E actual
-  generation per production type and published lifecycle emission factors.
+  Per-zone carbon intensity signal for nine Nordic electricity bidding zones
+  (NO1–NO5 and SE1–SE4) for carbon-aware computing, derived license-clean
+  and reproducibly from ENTSO-E actual generation per production type and
+  published lifecycle emission factors (IPCC AR5 Annex III). Includes
+  multi-year drift analysis and 96-hour per-zone forecasts for all nine zones
+  in the CarbonCast/EnsembleCI evaluation convention, with a full ADR chain
+  (0001–0008). First per-bidding-zone SE1–SE4 CI signal (granularity novelty).
 type: software
 authors:
   - family-names: "Botten Nicolaysen"
@@ -12,8 +16,8 @@ authors:
     orcid: "https://orcid.org/0009-0001-9188-6788"
 repository-code: "https://github.com/avalyset/khepri"
 license: Apache-2.0
-version: "1.0.0"
-date-released: "2026-06-29"
+version: "1.1.0"
+date-released: "2026-06-30"
 doi: 10.5281/zenodo.21042581
 identifiers:
   - type: doi
@@ -21,4 +25,4 @@ identifiers:
     description: Concept DOI (all versions)
   - type: doi
     value: 10.5281/zenodo.21042582
-    description: Version 1.0.0
+    description: Version 1.0.0 (NO1-NO5 only)
