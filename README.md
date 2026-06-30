@@ -28,7 +28,7 @@ Tools such as [codecarbon](https://github.com/mlco2/codecarbon) use a **uniform 
 | NO5  | 24.5 | |
 | SE1  | 20.6 | |
 | SE2  | 20.1 | |
-| SE3  | 14.5 | nuclear-only; near-zero marginal carbon |
+| SE3  | 14.5 | nuclear-dominant (~63%); lowest of the nine zones |
 | SE4  | 17.4 | structurally drifting (ADR-0007) |
 
 ## Layers (ADR-anchored)
@@ -47,7 +47,7 @@ Every method choice is locked in an ADR **before** computation — verifiable, n
 
 **NO (2021–2025):**
 - NO1/NO2/NO3 are stable year-to-year (<5% → annual update sufficient). NO4 is **event-driven** — gas turbines at Hammerfest LNG were offline after a fire (Sept 2020 → restart June 2022), so NO4 CI is period-dependent, not a constant. NO5 shows real gas phase-out.
-- **Forecast:** H0 holds broadly — simple baselines (persistence/SARIMA) are hard to beat for the stable zones; heavy ML is not safely better (gradient boosting collapses on the volatile NO4). NO4's event-step is not predicted (expected — a fire is not in the CI history). NO MAPE is in the same ballpark as CarbonCast's published regions (CarbonCast SE aggregate day-1 8.87% (EnsembleCI Table 2-verified; aggregate vs our per-zone, not apples-to-apples)).
+- **Forecast:** H0 holds broadly — simple baselines (persistence/SARIMA) are hard to beat for the stable zones; heavy ML is not safely better (gradient boosting collapses on the volatile NO4). NO4's event-step is not predicted (expected — a fire is not in the CI history). NO MAPE is in the same ballpark as CarbonCast's published regions — their SE aggregate is 8.87% day-1 (EnsembleCI Table 2-verified), though that's aggregate vs our per-zone, not apples-to-apples.
 
 **SE (2022–2025):**
 - SE1/SE2/SE3 stable; SE4 structurally drifting (pre-registered threshold, ADR-0007 provenance clean).
