@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21042581.svg)](https://doi.org/10.5281/zenodo.21042581)
 
-Når jeg først jobber med AI på mange felt, skulle det bare mangle å bidra her òg.
+Since I work with AI across many fields, it would be remiss not to contribute here too.
 
 ## What it is
 
@@ -15,7 +15,7 @@ This is the first per-zone NO CI signal with the field's eval convention and doc
 
 ## What it replaces
 
-Tools such as [codecarbon](https://github.com/mlco2/codecarbon) use a **uniform static value of 18.0 gCO2eq/kWh for all Norwegian and Swedish bidding zones** (`nordic_emissions.json`, verified against installed v3.2.8). This is too low for all zones and **~2.5× too low for NO4**, and it does not distinguish zones from one another. Khepri produces distinct, source-traceable per-zone values instead.
+Tools such as [codecarbon](https://github.com/mlco2/codecarbon) use a **uniform static value of 18.0 gCO2eq/kWh for all Norwegian and Swedish bidding zones** (`nordic_emissions.json`, verified against installed v3.2.8). This is wrong for every zone and in both directions — too low for most zones (**~2.5× too low for NO4**), yet too high for nuclear-dominated SE3 (true CI 14.5) — and it does not distinguish the zones from one another. Khepri produces distinct, source-traceable per-zone values instead.
 
 **2025 per-zone values (gCO2eq/kWh):**
 
@@ -47,7 +47,7 @@ Every method choice is locked in an ADR **before** computation — verifiable, n
 
 **NO (2021–2025):**
 - NO1/NO2/NO3 are stable year-to-year (<5% → annual update sufficient). NO4 is **event-driven** — gas turbines at Hammerfest LNG were offline after a fire (Sept 2020 → restart June 2022), so NO4 CI is period-dependent, not a constant. NO5 shows real gas phase-out.
-- **Forecast:** H0 holds broadly — simple baselines (persistence/SARIMA) are hard to beat for the stable zones; heavy ML is not safely better (gradient boosting collapses on the volatile NO4). NO4's event-step is not predicted (expected — a fire is not in the CI history). NO MAPE is in the same ballpark as CarbonCast's published regions (SE aggregate 5.78%).
+- **Forecast:** H0 holds broadly — simple baselines (persistence/SARIMA) are hard to beat for the stable zones; heavy ML is not safely better (gradient boosting collapses on the volatile NO4). NO4's event-step is not predicted (expected — a fire is not in the CI history). NO MAPE is in the same ballpark as CarbonCast's published regions (CarbonCast SE aggregate day-1 8.87% (EnsembleCI Table 2-verified; aggregate vs our per-zone, not apples-to-apples)).
 
 **SE (2022–2025):**
 - SE1/SE2/SE3 stable; SE4 structurally drifting (pre-registered threshold, ADR-0007 provenance clean).
@@ -58,7 +58,7 @@ Every method choice is locked in an ADR **before** computation — verifiable, n
 
 ## Two-way SE placeholder
 
-The Zenodo artifact (v1.1) includes the nine-zone CI values. A codecarbon PR (ADR-0005) covers the NO zones; SE placeholder correction requires a separate PR — not yet opened. The SE values are citable from this artifact.
+Two codecarbon PRs are open — NO ([#1260](https://github.com/mlco2/codecarbon/pull/1260)) and SE ([#1262](https://github.com/mlco2/codecarbon/pull/1262)), the SE one covering the two-way placeholder error — both awaiting maintainer review. The SE values are citable from this artifact.
 
 ## License (split)
 
@@ -69,4 +69,4 @@ Raw ENTSO-E data is not committed to this repo (see `.gitignore`); it is fetched
 
 ## Status
 
-Data core + drift + forecast built and verified for nine bidding zones (NO1–NO5, SE1–SE4). Adoption (codecarbon integration) covers NO; SE placeholder correction is a future step. Consumption-based layer is not built. See the ADRs for what is actually decided and what is open — nothing here is oversold.
+Data core + drift + forecast built and verified for nine bidding zones (NO1–NO5, SE1–SE4). Adoption: codecarbon PRs open for both NO (#1260) and SE (#1262). Consumption-based layer is not built. See the ADRs for what is actually decided and what is open — nothing here is oversold.
