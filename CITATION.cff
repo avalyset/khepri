@@ -29,3 +29,6 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.21058370
     description: Version 1.1.0 (NO+SE)
+  - type: doi
+    value: 10.5281/zenodo.21097430
+    description: Version 1.2.0 (manuscript-aligned)
