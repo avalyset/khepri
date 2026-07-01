@@ -1,12 +1,12 @@
 """
 Life-cycle emission factors per ENTSO-E production type (gCO2eq/kWh).
 
-SOURCE (Decision 1, ADR-0001): IPCC WG3 AR5 Annex III, Table A.III.2 —
+SOURCE (Decision 1, ADR-0001): IPCC WG3 AR5 Annex III —
 life-cycle medians. The primary source (IPCC PDF) is not directly reachable from the
 build environment; the values are taken from a checkable SECONDARY SOURCE that names
 the table:
   https://en.wikipedia.org/wiki/Life-cycle_greenhouse_gas_emissions_of_energy_sources
-  (column "IPCC 2014 / Annex III, Table A.III.2", median g CO2eq/kWh)
+  (the column citing IPCC AR5 Annex III life-cycle medians, g CO2eq/kWh)
 Independently confirmed for coal=820 / gas=490 against:
   https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
 
@@ -14,7 +14,7 @@ Each factor below is annotated with its source and whether the mapping is DIRECT
 """
 
 SOURCE = (
-    "IPCC WG3 AR5 Annex III, Table A.III.2 (life-cycle median, gCO2eq/kWh); "
+    "IPCC WG3 AR5 Annex III (life-cycle median, gCO2eq/kWh); "
     "secondary source: en.wikipedia.org/wiki/Life-cycle_greenhouse_gas_emissions_of_energy_sources"
 )
 

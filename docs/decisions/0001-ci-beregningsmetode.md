@@ -15,11 +15,11 @@ Each factor and each data characteristic has been verified against a named sourc
 
 ## Decision 1 — Factor source
 
-**IPCC WG3 AR5 Annex III, Table A.III.2** — lifecycle medians (gCO2eq/kWh).
+**IPCC WG3 AR5 Annex III** — lifecycle medians (gCO2eq/kWh).
 Lifecycle, not direct operation. The IPCC primary PDF is not directly reachable
 from the build environment; values are taken from a **checkable secondary source
 that names the table** (Wikipedia: *Life-cycle greenhouse gas emissions of energy
-sources*, the column citing IPCC Annex III Table A.III.2). This is explicitly a
+sources*, the column citing IPCC Annex III lifecycle medians). This is explicitly a
 secondary source — standard practice as long as it is named. Coal=820 / gas=490
 independently confirmed against the IPCC document's own PDF-URL via search.
 

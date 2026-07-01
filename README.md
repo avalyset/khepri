@@ -70,4 +70,4 @@ The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `fo
 
 ## Status
 
-Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). Adoption pull requests are open for NO (#1260) and SE (#1262). The consumption-based layer is not implemented. The DOI-archived release is version 1.1.0.
+Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). Adoption pull requests are open for NO (#1260) and SE (#1262). The consumption-based layer is not implemented. The current release is version 1.2.0; the concept DOI resolves to the latest archived version.
