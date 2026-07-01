@@ -15,7 +15,7 @@ authors:
     given-names: "Eirik"
     orcid: "https://orcid.org/0009-0001-9188-6788"
 repository-code: "https://github.com/avalyset/khepri"
-license: Apache-2.0
+license: [Apache-2.0, CC-BY-4.0]
 version: "1.1.0"
 date-released: "2026-06-30"
 doi: 10.5281/zenodo.21042581

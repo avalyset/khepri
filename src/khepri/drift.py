@@ -1,10 +1,10 @@
 """
-Drift-måling i CI-signalet (ADR-0003).
+Drift measurement in the CI signal (ADR-0003).
 
-Bruker NØYAKTIG ADR-0001+0002-pipelinen (khepri.ci.compute) per sone per år.
-Måler: årlig CI per sone, år-til-år endring %, miks-andel-drift per materiell
-type (prosentpoeng), NO4-gass-andel per år, og regime-test 2021-2022 vs 2023+.
-Terskel (pre-registrert i ADR-0003): CI-endring > 15 % ELLER miks-skift > 5 pp.
+Uses the ADR-0001+0002 pipeline (khepri.ci.compute) EXACTLY, per zone per year.
+Measures: annual CI per zone, year-over-year change %, mix-share drift per material
+type (percentage points), NO4 gas share per year, and a regime test 2021-2022 vs 2023+.
+Threshold (pre-registered in ADR-0003): CI change > 15% OR mix shift > 5 pp.
 """
 
 import os
@@ -13,8 +13,8 @@ import re
 
 from .ci import load_zone, compute, RAW_DIR
 
-CI_DRIFT_THRESHOLD_PCT = 15.0      # ADR-0003 beslutning 2
-MIX_SHIFT_THRESHOLD_PP = 5.0       # ADR-0003 beslutning 2
+CI_DRIFT_THRESHOLD_PCT = 15.0      # ADR-0003 decision 2
+MIX_SHIFT_THRESHOLD_PP = 5.0       # ADR-0003 decision 2
 ZONES = ["NO1", "NO2", "NO3", "NO4", "NO5"]
 
 
@@ -35,7 +35,7 @@ def zone_year_result(zid, year):
 
 
 def build():
-    """Returnerer {zid: {year: result}} for alle tilgjengelige sone-år."""
+    """Returns {zid: {year: result}} for all available zone-years."""
     data = {}
     for zid in ZONES:
         data[zid] = {}
@@ -48,7 +48,7 @@ def build():
 
 
 def yoy_changes(ci_by_year):
-    """År-til-år CI-endring i %. {(y0,y1): pct}."""
+    """Year-over-year CI change in %. {(y0,y1): pct}."""
     years = sorted(ci_by_year)
     out = {}
     for a, b in zip(years, years[1:]):
@@ -58,7 +58,7 @@ def yoy_changes(ci_by_year):
 
 
 def regime_compare(ci_by_year, crisis=(2021, 2022), later=(2023, 2024, 2025)):
-    """Deskriptiv regime-sammenligning (ADR-0003 beslutning 3). Effektstørrelse, ikke p-verdi."""
+    """Descriptive regime comparison (ADR-0003 decision 3). Effect size, not p-value."""
     cz = [ci_by_year[y] for y in crisis if y in ci_by_year]
     lz = [ci_by_year[y] for y in later if y in ci_by_year]
     if not cz or not lz:

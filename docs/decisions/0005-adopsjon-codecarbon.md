@@ -60,7 +60,7 @@ does not collide with ongoing work. The PR body explains the improvement fully
 
 ## Consequences
 - The gap is filled at source: Norwegian codecarbon users get per-zone figures
-  instead of a uniform 18.0 (which is too low for all, 2.5× too low for NO4).
+  instead of a uniform 18.0 (which is too low for all, 2.2× too low for NO4).
 - Khepri becomes a cited source in a widely used tool — adoption, not just
   publication.
 - The drift characterisation makes the PR accountable: users know which zones are

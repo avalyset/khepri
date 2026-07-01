@@ -1,0 +1,10 @@
+# Khepri runtime + test dependencies (pinned to the versions used for the archived results).
+# Raw ENTSO-E data is fetched via entsoe-py; see README "Reproduce".
+numpy==2.4.2
+pandas==3.0.2
+statsmodels==0.14.6
+lightgbm==4.6.0
+entsoe-py==0.8.0
+
+# Tests
+pytest==9.1.1

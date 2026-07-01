@@ -1,4 +1,4 @@
-"""Sanity-tester for forecast-laget (ADR-0004) — metrikk + baseliner, håndregnet."""
+"""Sanity tests for the forecast layer (ADR-0004) — metrics + baselines, hand-computed."""
 
 import os
 import sys
@@ -17,19 +17,19 @@ def test_mape_zero_on_perfect():
 
 
 def test_mape_known_value():
-    # faktisk 100, forecast 110 -> 10% MAPE
+    # actual 100, forecast 110 -> 10% MAPE
     assert abs(mape(np.array([100.0]), np.array([110.0])) - 10.0) < 1e-9
 
 
 def test_cindex_perfect_order():
     a = np.array([1.0, 2.0, 3.0, 4.0])
-    f = np.array([0.5, 0.9, 2.2, 5.0])  # samme rekkefølge
+    f = np.array([0.5, 0.9, 2.2, 5.0])  # same order
     assert cindex(a, f) == 1.0
 
 
 def test_cindex_reversed():
     a = np.array([1.0, 2.0, 3.0, 4.0])
-    f = np.array([4.0, 3.0, 2.0, 1.0])  # motsatt rekkefølge
+    f = np.array([4.0, 3.0, 2.0, 1.0])  # reversed order
     assert cindex(a, f) == 0.0
 
 
@@ -44,10 +44,10 @@ def test_flat_persistence_is_constant():
 
 def test_diurnal_repeats_last_day():
     idx = pd.date_range("2025-01-01", periods=200, freq="1h", tz="UTC")
-    # CI = time-på-døgnet, så siste 24t = 0..23 gjentatt
+    # CI = hour-of-day, so the last 24h = 0..23 repeated
     hist = pd.Series([i % 24 for i in range(200)], index=idx, dtype=float)
     o = idx[120]
     f = fc_diurnal(hist, o)
     assert len(f) == H
-    # forecast for h=1 skal matche samme time neste dag-profil
+    # forecast for h=1 should match the same hour in the next-day profile
     assert f[0] == hist.loc[o - pd.Timedelta(hours=23)]

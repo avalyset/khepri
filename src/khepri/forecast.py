@@ -1,18 +1,18 @@
 """
-Per-sone CI-forecast (ADR-0004).
+Per-zone CI forecast (ADR-0004).
 
-Horisont 96t dag-vis, forecast-origin daglig kl. 00:00 (CarbonCast-konvensjon:
-"predict the next 96 hours at 00:00"). Baseliner: flat + diurnal persistens (gulv),
-SARIMA (feltets SOTA-baseline å slå). Modell: SARIMA selv, + lett GBM (LightGBM)
-for å se om ML slår den (ADR-0004 beslutning 3, low->high).
+Horizon 96h day-wise, forecast origin daily at 00:00 (CarbonCast convention:
+"predict the next 96 hours at 00:00"). Baselines: flat + diurnal persistence (floor),
+SARIMA (the field's SOTA baseline to beat). Models: SARIMA itself, + a light GBM
+(LightGBM) to test whether ML beats it (ADR-0004 decision 3, low->high).
 
-Metrikk per (sone, modell, split, dag-horisont): MAPE (mean/median/90/95-pct),
-MAE, RMSE, concordance-index (LiteCast, ranking-relevans for scheduling).
+Metrics per (zone, model, split, day-horizon): MAPE (mean/median/90th/95th pct),
+MAE, RMSE, concordance index (LiteCast, ranking relevance for scheduling).
 
-NO4-FORVENTNING (pre-registrert, ADR-0004-korreksjon): NO4s store CI-bevegelser er
-en industriell hendelse (Hammerfest-brann 2020 -> restart juni 2022), ikke en glatt
-trend. En modell skal IKKE kunne forutsi disse sprangene fra CI-historikk alene.
-Høy NO4-skill over hendelsesgrensene => mistenk leakage, ikke ferdighet.
+NO4 EXPECTATION (pre-registered, ADR-0004 correction): NO4's large CI movements are
+an industrial event (Hammerfest fire 2020 -> restart June 2022), not a smooth trend.
+A model should NOT be able to predict these steps from CI history alone. High NO4
+skill across the event boundaries => suspect leakage, not skill.
 """
 
 import os
@@ -24,11 +24,11 @@ from .ci import load_zone, ci_series, RAW_DIR
 
 warnings.simplefilter("ignore")
 OUT_DIR = os.environ.get("KHEPRI_FC_OUT", os.path.expanduser("~/khepri-data/forecast"))
-H = 96  # horisont (timer)
+H = 96  # horizon (hours)
 
 
 def hourly_ci(zone, years):
-    """Sammenhengende timeoppløst CI-serie for en sone over gitte år."""
+    """Contiguous hourly-resolution CI series for a zone over the given years."""
     parts = []
     for y in years:
         fp = os.path.join(RAW_DIR, f"{zone}_generation_{y}.csv")
@@ -41,31 +41,31 @@ def hourly_ci(zone, years):
         return None
     s = pd.concat(parts).sort_index()
     s = s[~s.index.duplicated(keep="first")]
-    # timeoppløsning (2025 er blandet 15/60 -> timesnitt); reindekser til full timeserie
+    # hourly resolution (2025 is mixed 15/60 -> hourly mean); reindex to a full hourly series
     s = s.resample("1h").mean()
     full = pd.date_range(s.index.min(), s.index.max(), freq="1h", tz="UTC")
     s = s.reindex(full)
-    # korte hull interpoleres (forecast trenger sammenhengende historikk); lang-hull-andel rapporteres
+    # short gaps interpolated (the forecast needs contiguous history); long-gap fraction reported
     gap_frac = s.isna().mean()
     s = s.interpolate(limit=6).ffill().bfill()
     return s, gap_frac
 
 
-# ---------- baseliner & modeller ----------
+# ---------- baselines & models ----------
 def fc_flat(hist, origin):
     v = hist.loc[origin]
     return np.full(H, v)
 
 
 def fc_diurnal(hist, origin):
-    # gjenta siste 24t-profil 4 ganger
+    # repeat the last 24h profile 4 times
     last24 = hist.loc[origin - pd.Timedelta(hours=23): origin].values
     if len(last24) < 24:
         return np.full(H, hist.loc[origin])
     return np.tile(last24[-24:], 4)[:H]
 
 
-# SARIMA rulles inkrementelt i eval_split (append per dag), ikke re-apply per origin.
+# SARIMA is rolled incrementally in eval_split (append per day), not re-applied per origin.
 
 
 def build_gbm(hist, train_origins):
@@ -82,7 +82,7 @@ def build_gbm(hist, train_origins):
     if not X:
         return None
     models = []
-    for seed in (0, 1, 2):  # snitt 3 kjøringer (stokastisk)
+    for seed in (0, 1, 2):  # mean of 3 runs (stochastic)
         m = lgb.LGBMRegressor(n_estimators=200, num_leaves=31, learning_rate=0.05,
                               random_state=seed, verbose=-1)
         m.fit(np.array(X), np.array(y))
@@ -91,7 +91,7 @@ def build_gbm(hist, train_origins):
 
 
 def _features(hist, origin):
-    # origin-tidspunkt + nylige CI-lag (24t)
+    # origin timestamp + recent CI lags (24h)
     h = origin.hour
     feats = [np.sin(2 * np.pi * h / 24), np.cos(2 * np.pi * h / 24),
              origin.dayofweek, origin.month, float(hist.loc[origin])]
@@ -107,7 +107,7 @@ def fc_gbm(models, hist, origin):
     return preds
 
 
-# ---------- metrikker ----------
+# ---------- metrics ----------
 def mape(a, f):
     a = np.asarray(a, float); f = np.asarray(f, float)
     mask = np.abs(a) > 1e-6
@@ -115,7 +115,7 @@ def mape(a, f):
 
 
 def cindex(a, f):
-    """Concordance: andel par der forecast rangerer i samme rekkefølge som faktisk."""
+    """Concordance: fraction of pairs the forecast ranks in the same order as actual."""
     a = np.asarray(a, float); f = np.asarray(f, float)
     n = len(a); c = t = 0
     for i in range(n):
@@ -139,10 +139,10 @@ def eval_split(zone, train_years, train_end, test_start, test_end, models_on=Tru
     if res is None:
         return None
     hist, gap = res
-    # origins = daglig 00:00 i testperioden med full 96t-fasit
+    # origins = daily 00:00 in the test period with a full 96h ground truth
     origins = [o for o in pd.date_range(test_start, test_end, freq="1D", tz="UTC")
                if o in hist.index and (o + pd.Timedelta(hours=H)) <= hist.index.max()]
-    # SARIMA fit på treningsdel
+    # SARIMA fit on the training part
     fitted = None
     try:
         from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -158,7 +158,7 @@ def eval_split(zone, train_years, train_end, test_start, test_end, models_on=Tru
                          train_end, freq="1D", tz="UTC") if o in hist.index]
         gbm = build_gbm(hist, train_origins[-365:]) if train_origins else None
 
-    # SARIMA per origin på avgrenset 45-dagers vindu (minne-trygt, fanger daglig sesong)
+    # SARIMA per origin on a bounded 45-day window (memory-safe, captures daily seasonality)
     WIN = pd.Timedelta(days=45)
     rows = []
     for o in origins:
