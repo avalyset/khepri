@@ -26,3 +26,6 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.21042582
     description: Version 1.0.0 (NO1-NO5 only)
+  - type: doi
+    value: 10.5281/zenodo.21058370
+    description: Version 1.1.0 (NO+SE)
