@@ -1,6 +1,7 @@
 # Khepri
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21042581.svg)](https://doi.org/10.5281/zenodo.21042581)
+[![ci](https://github.com/avalyset/khepri/actions/workflows/ci.yml/badge.svg)](https://github.com/avalyset/khepri/actions/workflows/ci.yml)
 
 Khepri is a reproducible, per–bidding-zone carbon-intensity (CI) dataset and method for the nine Nordic electricity bidding zones — **NO1–NO5** (Norway) and **SE1–SE4** (Sweden) — for use in carbon-aware computing. Carbon intensity is derived deterministically from:
 
