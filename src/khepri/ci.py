@@ -154,11 +154,25 @@ def compute_sensitivity(df):
     return compute(df, factors=factors2, excluded=set())
 
 
-def run_all():
+# Zone lists. V1 (published) = NO/SE. V2 (this extension) adds DK1, DK2, FI.
+# The pipeline is zone-agnostic (compute() takes a df); only this orchestration lists zones.
+ZONES_V1_NO = ["NO1", "NO2", "NO3", "NO4", "NO5"]
+ZONES_V1_SE = ["SE1", "SE2", "SE3", "SE4"]
+ZONES_V2_ADDED = ["DK1", "DK2", "FI"]
+
+
+def run_all(zones=None, year=2025):
+    """Per-zone CI for `zones` and `year`. Default = NO (v1 reproducibility, unchanged).
+
+    Pass zones=ZONES_V2_ADDED to compute the v2 DK/FI extension once the raw
+    {zid}_generation_{year}.csv files are present in KHEPRI_RAW.
+    """
+    if zones is None:
+        zones = ZONES_V1_NO
     os.makedirs(OUT_DIR, exist_ok=True)
     rows = []
-    for zid in ["NO1", "NO2", "NO3", "NO4", "NO5"]:
-        paths = glob.glob(os.path.join(RAW_DIR, f"{zid}_generation_2025.csv"))
+    for zid in zones:
+        paths = glob.glob(os.path.join(RAW_DIR, f"{zid}_generation_{year}.csv"))
         if not paths:
             print(f"{zid}: MISSING raw file"); continue
         df = load_zone(paths[0])
@@ -168,5 +182,5 @@ def run_all():
         rows.append((zid, r))
         # per-zone interval time series
         r["interval_ci"].rename("CI_gCO2_per_kWh").to_csv(
-            os.path.join(OUT_DIR, f"{zid}_interval_ci_2025.csv"))
+            os.path.join(OUT_DIR, f"{zid}_interval_ci_{year}.csv"))
     return rows

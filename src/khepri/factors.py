@@ -28,22 +28,35 @@ FACTOR_TABLE = {
     "Wind Offshore":                   (12,  "IPCC AR5 'Wind offshore' median (direct match)"),
     "Solar":                           (48,  "IPCC AR5 'Solar PV – utility' median (direct match)"),
     "Biomass":                         (230, "IPCC AR5 'Biomass – dedicated' median (direct match)"),
-    # For robustness (does not occur in NO 2025 data, but mapped in case it appears):
-    "Fossil Hard coal":                (820, "IPCC AR5 'Coal – PC' median (direct match)"),
+    # For robustness (rare/absent in NO 2025 data, but mapped in case it appears; all are
+    # MATERIAL and directly matched for the v2 DK/FI zones — coal/oil/gas for DK, nuclear for FI):
+    "Fossil Hard coal":                (820, "IPCC AR5 'Coal – PC' median (direct match); material in DK1/DK2"),
     "Geothermal":                      (38,  "IPCC AR5 'Geothermal' median (direct match)"),
-    "Nuclear":                         (12,  "IPCC AR5 'Nuclear' median (direct match)"),
-    "Fossil Oil":                      (650, "FLAG: oil has no clean IPCC AR5 median; 650 is a flagged approximation (does not occur in NO 2025)"),
+    "Nuclear":                         (12,  "IPCC AR5 'Nuclear' median (direct match); dominant in FI"),
+    "Fossil Oil":                      (650, "FLAG: oil has no clean IPCC AR5 median; 650 is a flagged approximation (occurs in DK/FI peaking/CHP)"),
 }
 
 FACTORS = {k: v[0] for k, v in FACTOR_TABLE.items()}
 
-# Types that occur in NO data but WITHOUT a verified factor in the chosen source.
+# Types that occur in the ENTSO-E data but WITHOUT a verified factor in the chosen source.
 # Decision 2/consequence (ADR-0001): EXCLUDED from the primary CI; sensitivity is reported.
-EXCLUDED_NO_VERIFIED_FACTOR = {"Waste", "Other", "Other renewable"}
+#   - Waste/Other/Other renewable: original NO/SE set (v1).
+#   - "Fossil Peat": added for v2 (occurs materially in FI). IPCC AR5 Annex III has NO peat
+#     life-cycle median, so — consistent with the v1 discipline for oil/waste — no authoritative
+#     primary factor is invented; peat is EXCLUDED from primary and reported as sensitivity.
+# NOTE (v2 materiality caveat): in NO/SE these excluded types are negligible, so the primary CI
+# is barely affected. In DK, "Waste" (waste-to-energy CHP) is MATERIAL; excluding it therefore
+# biases the DK primary CI DOWNWARD. This is flagged, not silently absorbed — compare the primary
+# CI against compute_sensitivity() and report the included-energy share for DK.
+EXCLUDED_NO_VERIFIED_FACTOR = {"Waste", "Other", "Other renewable", "Fossil Peat"}
 
 # ONLY for the sensitivity run (never primary). Flagged proxies without their own primary source.
 SENSITIVITY_PROXY = {
     "Waste": (580, "FLAG/proxy: waste-to-energy ~580, no IPCC median; sensitivity only"),
     "Other renewable": (230, "FLAG/proxy: assumed biomass-like 230; sensitivity only"),
     "Other": (475, "FLAG/proxy: IEA world average 475; sensitivity only"),
+    # v2: IPCC AR5 has no peat median. Peat combustion is coal-like or worse per IPCC national
+    # GHG inventory guidance; 820 (coal-equivalent) is a FLAGGED upper-bound proxy for the
+    # sensitivity run ONLY — never the primary figure, never presented as an AR5 value.
+    "Fossil Peat": (820, "FLAG/proxy: no IPCC AR5 peat median; coal-equivalent 820 upper bound; sensitivity only"),
 }
