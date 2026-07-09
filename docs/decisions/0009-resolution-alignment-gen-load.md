@@ -12,7 +12,7 @@
 
 ## Context
 
-The v2 extension adds demand (Actual Total Load, A65) alongside generation (Actual
+The Khepri-Nordic extension adds demand (Actual Total Load, A65) alongside generation (Actual
 Generation per Production Type, A75) for the twelve Nordic bidding zones
 (NO1–NO5, SE1–SE4, DK1, DK2, FI), full-year 2025. Any generation+demand balance —
 and the consumption-based CI layer that will sit on the partner's flow-tracing —
@@ -94,12 +94,12 @@ consumption-CI layer must inherit the same balancing grid, the decision stays
 
 ## Consequences
 
-- The chosen path must be **declared explicitly per zone** in the v2 method note,
+- The chosen path must be **declared explicitly per zone** in the Khepri-Nordic method note,
   e.g. *"DK balanced on 60-min (native load resolution); NO/SE/FI on their common
   grid."* — no single global resolution is truthful for 2025.
 - **Reproducibility / comparability:** whichever path is taken, the switch dates
   above are part of the record; a reader must be able to reconstruct the grid per
-  zone per date. The v2 preprint's method section must state the per-zone grid and
+  zone per date. The Khepri v2.0 preprint's method section must state the per-zone grid and
   the A/B/C choice.
 - NO/SE/FI need no forced alignment for 2025 (already 100 %); only DK carries the
   resolution decision.

@@ -1,16 +1,26 @@
-# Khepri v2 — state of record (dev)
+# Khepri-Nordic — state of record (dev)
+
+## Naming (authoritative — inherit this, do not recreate the "v2" ambiguity)
+
+- **khepri v1.2** — the *published*, DOI-anchored dataset: NO+SE, production-based. Unchanged.
+- **Khepri-Nordic** — the codename for *this unpublished dev track*: DK1/DK2/FI generation
+  + demand (load) for all 12 zones + the coming consumption layer. This replaces every
+  ambiguous use of "v2" that referred to the dev work.
+- **Khepri v2.0** — what Khepri-Nordic *becomes when it is published with a DOI* (future).
+- Never write "v2" alone for the dev work again. (The git branch `v2-dev-dk-fi` and the
+  working-dir name `v2-dk-fi` keep their names — they are refs/paths, not content.)
 
 **Status:** work in progress on local branch `v2-dev-dk-fi` (not pushed; repo is PUBLIC).
 **Last verified against disk:** 2026-07-09.
-**Scope of v2:** geographic completion of the production-based per-zone CI to the
+**Scope of Khepri-Nordic:** geographic completion of the production-based per-zone CI to the
 continental Nordic zones (DK1, DK2, FI) + a demand (load) side for all twelve zones,
 as the substrate for a later **consumption-based CI** layer. Iceland is out of scope
 (isolated system, not in ENTSO-E).
 
 > This file is the single verified base for the next work step. It is **dev-facing**;
-> the published-facing `README.md` stays v1.2 (NO+SE) and must not carry v2-dev state.
-> "v2" here is the DK/FI + demand + consumption roadmap — distinct from the earlier
-> "SE v2" extension, which is already published inside v1.2.
+> the published-facing `README.md` stays v1.2 (NO+SE) and must not carry Khepri-Nordic state.
+> Khepri-Nordic is the DK/FI + demand + consumption roadmap — distinct from the earlier
+> "SE v2" extension, which is already published inside khepri v1.2.
 
 ## What is decided vs gated
 
@@ -20,10 +30,10 @@ as the substrate for a later **consumption-based CI** layer. Iceland is out of s
   flow-tracing data + a balancing method (INATECH Freiburg, expected later). The
   resolution choice (ADR-0009) stays **Proposed** until that method's native grid is
   known — the consumption layer must inherit the same balancing grid.
-- **Not in v2 scope:** cross-border flows/exchanges (partner's layer), marginal
+- **Not in Khepri-Nordic scope:** cross-border flows/exchanges (partner's layer), marginal
   emissions.
 
-## v2 repo footprint (branch `v2-dev-dk-fi` vs `main`)
+## Khepri-Nordic repo footprint (branch `v2-dev-dk-fi` vs `main`)
 
 Three commits; complete list of repo files touched:
 
@@ -39,7 +49,7 @@ the working area (see below), mirroring how the v1 SE workflow was run.
 
 ## Verified per-zone CI (2025, production-based, gCO2eq/kWh)
 
-v2-added zones only (NO/SE are the v1 base, in README):
+Khepri-Nordic-added zones only (NO/SE are the v1 base, in README):
 
 | Zone | Primary CI | Sensitivity (incl. Waste/Peat proxies) | Note |
 |------|-----------:|---------------------------------------:|------|
@@ -59,7 +69,7 @@ excluded (near-empty ENTSO-E column, ~all NaN).
 |------|----------------------|:----:|:-----------:|:-----------:|
 | NO1–NO5 | `~/khepri-data/raw/entsoe-rest/` (v1) | ✓ | ✓ | v1 |
 | SE1–SE4 | `~/khepri-data/se/raw/entsoe-rest/` (v1) | ✓ | ✓ | v1 |
-| DK1, DK2, FI | `~/khepri-data/v2-dk-fi/` (v2) | ✓ | ✓ | v2 (above) |
+| DK1, DK2, FI | `~/khepri-data/v2-dk-fi/` (Khepri-Nordic) | ✓ | ✓ | Khepri-Nordic (above) |
 
 All load + aligned-load CSVs (12 zones) and DK/FI generation live in the working
 area `~/khepri-data/v2-dk-fi/`. NO/SE generation stays in its v1 canonical location;
