@@ -55,8 +55,11 @@ SENSITIVITY_PROXY = {
     "Waste": (580, "FLAG/proxy: waste-to-energy ~580, no IPCC median; sensitivity only"),
     "Other renewable": (230, "FLAG/proxy: assumed biomass-like 230; sensitivity only"),
     "Other": (475, "FLAG/proxy: IEA world average 475; sensitivity only"),
-    # v2: IPCC AR5 has no peat median. Peat combustion is coal-like or worse per IPCC national
-    # GHG inventory guidance; 820 (coal-equivalent) is a FLAGGED upper-bound proxy for the
-    # sensitivity run ONLY — never the primary figure, never presented as an AR5 value.
-    "Fossil Peat": (820, "FLAG/proxy: no IPCC AR5 peat median; coal-equivalent 820 upper bound; sensitivity only"),
+    # v2: IPCC AR5 has no peat median, and no verified peat life-cycle factor exists to invent one.
+    # DIRECTION (verified): IPCC 2006 default direct CO2 puts peat at 106 t/TJ ABOVE bituminous coal
+    # at 94.6 t/TJ, and peat is NOT treated as biomass (it emits). So peat's true life-cycle value is
+    # >= the coal AR5 lifecycle median (820) — 820 is a FLOOR, not a ceiling. 820 is therefore a
+    # FLAGGED coal-equivalent LOWER-bound proxy for the sensitivity run ONLY; the true peat value is
+    # higher and unbounded above without a verified peat factor. Never the primary figure, never an AR5 value.
+    "Fossil Peat": (820, "FLAG/proxy: no IPCC AR5 peat median; coal-equivalent 820 is a LOWER-bound (floor) proxy — true peat >= 820 (IPCC 2006: peat 106 t/TJ > coal 94.6 t/TJ, not biomass); sensitivity only, floor not ceiling"),
 }
