@@ -26,10 +26,14 @@ as the substrate for a later **consumption-based CI** layer. Iceland is out of s
 
 - **Done & verified:** DK1/DK2/FI production-based CI (2025); demand/load for all 12
   zones (2025); load↔generation resolution alignment characterised (ADR-0009).
-- **Gated (not started):** consumption-based CI. Blocked on external zonal
-  flow-tracing data + a balancing method (INATECH Freiburg, expected later). The
-  resolution choice (ADR-0009) stays **Proposed** until that method's native grid is
-  known — the consumption layer must inherit the same balancing grid.
+- **Gated (data received, unusable as-is):** consumption-based CI. The external zonal
+  flow-tracing dataset (2025) arrived from INATECH Freiburg but was **truncated at the
+  2^20 Excel row cap** (~1–15 Jan 2025, ~42% of series cut) — unusable as-is; an
+  un-truncated re-export (Parquet/chunked) has been requested. The **balancing method**
+  is still pending, so the resolution choice (ADR-0009) stays **Proposed** until that
+  method's native grid is known — the consumption layer must inherit the same balancing
+  grid. Sub-state advanced (awaiting-data → data-received-but-unusable, ball with the
+  partner); the gate itself is unchanged.
 - **Not in Khepri-Nordic scope:** cross-border flows/exchanges (partner's layer), marginal
   emissions.
 
@@ -102,7 +106,7 @@ see above).
 
 ## What remains (next steps)
 
-1. Consumption-CI layer — **gated** on flow-tracing data + balancing method (INATECH).
+1. Consumption-CI layer — **gated** on the balancing method (INATECH). Flow-tracing data (2025) received but truncated at the 2^20 row cap; un-truncated re-export requested.
 2. On arrival of the balancing method: resolve ADR-0009 (path A downsample gen→60min /
    B upsample load→15min / C keep native separate) and move it to Accepted, declaring
    the grid **per zone**.
