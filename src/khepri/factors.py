@@ -54,7 +54,13 @@ EXCLUDED_NO_VERIFIED_FACTOR = {"Waste", "Other", "Other renewable", "Fossil Peat
 SENSITIVITY_PROXY = {
     "Waste": (580, "FLAG/proxy: waste-to-energy ~580, no IPCC median; sensitivity only"),
     "Other renewable": (230, "FLAG/proxy: assumed biomass-like 230; sensitivity only"),
-    "Other": (475, "FLAG/proxy: IEA world average 475; sensitivity only"),
+    # v2 correction: 475 was previously attributed to an IEA world average. That
+    # attribution was wrong — IEA Electricity 2026 reports 435 gCO2/kWh for the 2025
+    # world average (Electricity 2025: 445 for 2024), and 475 matches no recent IEA
+    # figure. The VALUE is retained deliberately: "Other" is an unresolved residual
+    # category, and 475 is a deliberately high proxy used to keep the sensitivity run
+    # conservative. Only the source claim is corrected, not the number.
+    "Other": (475, "FLAG/proxy: deliberately high proxy for an unresolved residual category, not sourced to any published average; sensitivity only (reference point: IEA world average 435 gCO2/kWh for 2025, IEA Electricity 2026)"),
     # v2: IPCC AR5 has no peat median, and no verified peat life-cycle factor exists to invent one.
     # DIRECTION (verified): IPCC 2006 default direct CO2 puts peat at 106 t/TJ ABOVE bituminous coal
     # at 94.6 t/TJ, and peat is NOT treated as biomass (it emits). So peat's true life-cycle value is
