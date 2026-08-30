@@ -99,8 +99,12 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
     erate = sum(g[c] * factors[c] for c in included)
     ici = (erate / gsum).replace([float("inf"), float("-inf")], pd.NA).dropna()
 
-    # energy-weighted mix share over ALL occurring types (clean intervals)
-    all_energy = df[occurring][clean].clip(lower=0).mul(d, axis=0)
+    # energy-weighted mix share over ALL occurring types (clean intervals).
+    # fillna(0.0) BEFORE summing, same convention as the included-type energy above:
+    # a NaN in a negligible type is 0, not data loss. Without it a single NaN in any
+    # occurring column propagates through .to_numpy().sum() and makes mix_pct and
+    # included_energy_share_pct NaN for the whole zone (NO2: Wind Offshore, NO3: Solar).
+    all_energy = df[occurring][clean].fillna(0.0).clip(lower=0).mul(d, axis=0)
     all_tot = float(all_energy.to_numpy().sum())
     mix = (all_energy.sum() / all_tot * 100).sort_values(ascending=False)
     included_share = energy.to_numpy().sum() / all_tot * 100 if all_tot else float("nan")
