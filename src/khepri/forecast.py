@@ -9,10 +9,11 @@ SARIMA (the field's SOTA baseline to beat). Models: SARIMA itself, + a light GBM
 Metrics per (zone, model, split, day-horizon): MAPE (mean/median/90th/95th pct),
 MAE, RMSE, concordance index (LiteCast, ranking relevance for scheduling).
 
-NO4 EXPECTATION (pre-registered, ADR-0004 correction): NO4's large CI movements are
-an industrial event (Hammerfest fire 2020 -> restart June 2022), not a smooth trend.
-A model should NOT be able to predict these steps from CI history alone. High NO4
-skill across the event boundaries => suspect leakage, not skill.
+NO4 EXPECTATION (pre-registered, ADR-0004 correction): NO4's large CI movements
+track a step change in its fossil-gas share (near zero in 2021, 6.23% in 2024,
+3.63% in 2025), not a smooth trend. A model should NOT be able to predict these
+steps from CI history alone. High NO4 skill across the step boundaries =>
+suspect leakage, not skill.
 """
 
 import os

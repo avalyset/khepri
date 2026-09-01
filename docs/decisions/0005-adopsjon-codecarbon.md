@@ -82,3 +82,15 @@ does not collide with ongoing work. The PR body explains the improvement fully
 Adoption (this ADR) builds on data-core + drift + forecast (all complete). Freeze
 (Phase 5) is separate: DOI freeze of the Khepri artefact strengthens the PR
 (citable anchor) but does not block it.
+
+
+---
+
+**Note added 2026-09-01.** This ADR refers to the 2020–2022 gap in NO4 gas
+generation by naming a specific plant and an external news report. That
+attribution is not established by our own data: the ENTSO-E extract reports
+generation per production type, not per plant, so the cause of the gap cannot be
+derived from it. The decision recorded above rests on the *measured* gas share —
+near zero in 2021, 6.23% in 2024, 3.63% in 2025 — which is unaffected, and the
+reasoning is therefore left as written. The plant attribution is no longer used
+in outward-facing material (README, method notes, upstream pull requests).

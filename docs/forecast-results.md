@@ -44,10 +44,10 @@ real **limitation of production-based per-zone CI for pure-hydro zones** — not
 model skill.
 
 ### 3. NO4 — the leakage check is CLEAN, exactly as pre-registered
-Pre-registered expectation (Hammerfest correction): NO4's large CI movements are
-an industrial event (fire/restart), not predictable from CI history. Confirmed
+Pre-registered expectation (ADR-0004 correction): NO4's large CI movements track
+a step change in its fossil-gas share, not predictable from CI history. Confirmed
 against data:
-- **NO4 H2-2021 (plant offline, pure hydro): MAPE 2.94 — trivially easy** (gas
+- **NO4 H2-2021 (gas near zero, pure hydro): MAPE 2.94 — trivially easy** (gas
   absent).
 - **NO4 2025/2026 (gas in operation, volatile): MAPE 7.24 / 10.51 — hardest of
   all zones.**
