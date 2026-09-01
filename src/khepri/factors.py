@@ -1,21 +1,35 @@
 """
 Life-cycle emission factors per ENTSO-E production type (gCO2eq/kWh).
 
-SOURCE (Decision 1, ADR-0001): IPCC WG3 AR5 Annex III —
-life-cycle medians. The primary source (IPCC PDF) is not directly reachable from the
-build environment; the values are taken from a checkable SECONDARY SOURCE that names
-the table:
-  https://en.wikipedia.org/wiki/Life-cycle_greenhouse_gas_emissions_of_energy_sources
-  (the column citing IPCC AR5 Annex III life-cycle medians, g CO2eq/kWh)
-Independently confirmed for coal=820 / gas=490 against:
+SOURCE (Decision 1, ADR-0001): IPCC WG3 AR5 Annex III, Table A.III.2
+"Emissions of selected electricity supply technologies (gCO2eq/kWh)",
+column "Lifecycle emissions (incl. albedo effect)", Median.
+
+Every value below has been verified against that table in the PRIMARY source:
   https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_annex-iii.pdf
+  downloaded 2026-09-01, 757191 bytes, 22 pages
+  sha256 dec39383e03caf843f833ad8f4b373f72be3b86ada6d826bd172e8955ffe24c2
+
+Three entries are NOT a direct read of an AR5 median, and are marked as such below:
+  - Fossil Oil (650): AR5 Table A.III.2 has no oil row at all. This is a flagged
+    approximation. It never occurs in the Nordic extract (0 MW in every zone-year),
+    so it does not enter any published figure.
+  - Hydro Pumped Storage (24): AR5 has no pumped-storage row; PROXY to the
+    Hydropower median. The real footprint depends on the charging source.
+  - Solar (48): AR5 carries three solar rows — Solar PV utility 48, Solar PV
+    rooftop 41, Concentrated Solar Power 27 — and utility is chosen because
+    ENTSO-E reports grid-connected generation. This is the only mapping choice
+    with a measurable effect on the published per-zone values: at most
+    0.85 gCO2eq/kWh, on SE4, which would read 16.57 instead of 17.42 on the
+    rooftop row.
 
 Each factor below is annotated with its source and whether the mapping is DIRECT or PROXY.
 """
 
 SOURCE = (
-    "IPCC WG3 AR5 Annex III (life-cycle median, gCO2eq/kWh); "
-    "secondary source: en.wikipedia.org/wiki/Life-cycle_greenhouse_gas_emissions_of_energy_sources"
+    "IPCC WG3 AR5 Annex III, Table A.III.2 (lifecycle median, gCO2eq/kWh); "
+    "primary source verified 2026-09-01, "
+    "sha256 dec39383e03caf843f833ad8f4b373f72be3b86ada6d826bd172e8955ffe24c2"
 )
 
 # (factor, source-/mapping note)
@@ -26,12 +40,13 @@ FACTOR_TABLE = {
     "Hydro Pumped Storage":            (24,  "PROXY: IPCC 'Hydropower' 24; real footprint depends on the charging source"),
     "Wind Onshore":                    (11,  "IPCC AR5 'Wind onshore' median (direct match)"),
     "Wind Offshore":                   (12,  "IPCC AR5 'Wind offshore' median (direct match)"),
-    "Solar":                           (48,  "IPCC AR5 'Solar PV – utility' median (direct match)"),
+    "Solar":                           (48,  "IPCC AR5 'Solar PV – utility' median; utility row chosen because ENTSO-E reports grid-connected generation (rooftop 41 / CSP 27 also exist)"),
     "Biomass":                         (230, "IPCC AR5 'Biomass – dedicated' median (direct match)"),
     # For robustness (does not occur in NO 2025 data, but mapped in case it appears):
     "Fossil Hard coal":                (820, "IPCC AR5 'Coal – PC' median (direct match)"),
     "Geothermal":                      (38,  "IPCC AR5 'Geothermal' median (direct match)"),
     "Nuclear":                         (12,  "IPCC AR5 'Nuclear' median (direct match)"),
+    "Marine":                          (17,  "IPCC AR5 'Ocean' median (direct match); occurs in SE3 2021-2022 with zero generation"),
     "Fossil Oil":                      (650, "FLAG: oil has no clean IPCC AR5 median; 650 is a flagged approximation (does not occur in NO 2025)"),
 }
 

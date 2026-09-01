@@ -22,7 +22,7 @@ The method is production-based and spans a data core, multi-year drift character
 | NO1 | 23.31 | |
 | NO2 | 23.85 | |
 | NO3 | 21.46 | |
-| NO4 | 39.65 | gas-turbine dependent (Hammerfest LNG) |
+| NO4 | 39.65 | only zone with a material fossil-gas share (3.63% in 2025) |
 | NO5 | 24.46 | |
 | SE1 | 20.63 | |
 | SE2 | 20.11 | |
@@ -37,7 +37,7 @@ Carbon intensity is production-based: it weights the generation produced within 
 
 ## Findings
 
-**Norway (2021–2025).** NO1, NO2, and NO3 are stable year to year (under 5%, so an annual update is sufficient). NO4 is event-driven: the Hammerfest LNG gas turbines were offline after a September 2020 fire and restarted in June 2022, so NO4's CI is period-dependent rather than a constant. NO5 shows a real gas phase-out. In forecasting, simple baselines (persistence and SARIMA) are hard to beat for the stable zones, and gradient boosting collapses on the volatile NO4; the null hypothesis that simple baselines suffice holds broadly. NO4's event step is not predicted, as expected — a fire is not present in the CI history. NO forecast accuracy is of the same order as published regional results: the CarbonCast Swedish aggregate is 8.87% day-1 (EnsembleCI Table 2), which is a country aggregate and not directly comparable to the per-zone figures here.
+**Norway (2021–2025).** NO1, NO2, and NO3 are stable year to year (under 5%, so an annual update is sufficient). NO4 is event-driven: it is the only zone with a material fossil-gas share, and that share moves between years — near zero in 2021, 6.23% in 2024, 3.63% in 2025 — so NO4's CI is period-dependent rather than a constant. NO5 shows a real gas phase-out. In forecasting, simple baselines (persistence and SARIMA) are hard to beat for the stable zones, and gradient boosting collapses on the volatile NO4; the null hypothesis that simple baselines suffice holds broadly. NO4's event step is not predicted, as expected — a step change in gas dispatch is not present in the CI history. NO forecast accuracy is of the same order as published regional results: the CarbonCast Swedish aggregate is 8.87% day-1 (EnsembleCI Table 2), which is a country aggregate and not directly comparable to the per-zone figures here.
 
 **Sweden (2022–2025).** SE1, SE2, and SE3 hold their CI stable; SE4 crosses the pre-registered 15% year-over-year threshold (+15.21%, solar-driven). In forecasting, SARIMA beats gradient boosting in all four zones, so the null hypothesis is not rejected. SE3 reaches 4.55% MAPE (nuclear-dominated, low variance); SE4 is 20.19% (drift-driven). SE1 and SE2 have a concordance index near 0.58–0.60: level accuracy is acceptable but direction tracking is limited, which reduces scheduling value in those two zones.
 
