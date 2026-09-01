@@ -99,3 +99,15 @@ final evaluation.
 - H2 2021 test as the ONLY test (exact field match): rejected — does not capture
   the drift regime our own ADR-0003 identified; used as SECONDARY comparability
   anchor alongside the primary drift-aware split with separate drift-zone reporting.
+
+
+---
+
+**Note added 2026-09-01.** This ADR refers to the 2020–2022 gap in NO4 gas
+generation by naming a specific plant and an external news report. That
+attribution is not established by our own data: the ENTSO-E extract reports
+generation per production type, not per plant, so the cause of the gap cannot be
+derived from it. The decision recorded above rests on the *measured* gas share —
+near zero in 2021, 6.23% in 2024, 3.63% in 2025 — which is unaffected, and the
+reasoning is therefore left as written. The plant attribution is no longer used
+in outward-facing material (README, method notes, upstream pull requests).
