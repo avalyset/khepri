@@ -32,24 +32,26 @@ Production-based CI per zone per year, ADR-0001+0002 pipeline. Threshold
 
 ## NO4 — driver measured (not hunted): gas share per year
 
-CORRECTED with 2019-2020 data (see "Correction" below): the driver is the
-Hammerfest LNG outage, not a new gas ramp.
+CORRECTED with 2019-2020 data (see "Correction" below): the driver is a
+temporary absence of gas generation, not a new gas ramp.
 
-| Year | Fossil Gas mean MW | Fossil Gas % of mix | CI | Hammerfest LNG status |
-|----|-----:|-----:|-----:|---|
-| 2019 | 194 | — | (outside primary window) | normal operation |
-| 2020 | 124 | — | — | fire Sept. 2020 → outage |
-| 2021 | 2 | ~0.07% | 23.34 | **offline all year** |
-| 2022 | 111 | 3.14% | 37.67 | restart 2 June 2022 |
-| 2023 | 152 | 4.78% | 45.08 | full operation |
-| 2024 | 168 | 6.23% | 51.46 | full operation |
-| 2025 | 105 | 3.63% | 39.65 | operation |
+| Year | Fossil Gas mean MW | Fossil Gas % of mix | CI |
+|----|-----:|-----:|-----:|
+| 2019 | 194 | — | (outside primary window) |
+| 2020 | 124 | — | — |
+| 2021 | 2 | ~0.07% | 23.34 |
+| 2022 | 111 | 3.14% | 37.67 |
+| 2023 | 152 | 4.78% | 45.08 |
+| 2024 | 168 | 6.23% | 51.46 |
+| 2025 | 105 | 3.63% | 39.65 |
 
-NO4's CI tracks the Hammerfest LNG (Melkøya) gas turbines. The plant shut down
-after a fire in Sept. 2020, was offline ~20 months, and restarted 2 June 2022
-([source](https://maritime-executive.com/article/lng-production-resumes-at-hammerfest-20-months-after-fire)).
-The 2021 collapse (2 MW) is the outage; the "ramp" 2022-2024 is **recovery after
-the fire**, not new growth.
+NO4's CI tracks its fossil-gas share, which is what the table above measures.
+The 2021 value (2 MW mean, ~0.07% of the mix) is a near-total absence of gas
+generation; the rise through 2022-2024 returns the share to the level seen in
+2019 (194 MW mean). On the data alone this is a **return to the earlier level**,
+not new growth. What took gas out of NO4 in 2021 is not derivable from the
+ENTSO-E extract, which reports generation per production type and not per plant;
+no external attribution is made here.
 
 ### Correction (R15 / B3)
 An earlier draft (commit 1ac6b96, pushed) described NO4 as a "Melkøya gas ramp
