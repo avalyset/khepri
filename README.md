@@ -1,6 +1,7 @@
 # Khepri
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21042581.svg)](https://doi.org/10.5281/zenodo.21042581)
+[![arXiv](https://img.shields.io/badge/arXiv-2608.29717-b31b1b.svg)](https://arxiv.org/abs/2608.29717)
 [![ci](https://github.com/avalyset/khepri/actions/workflows/ci.yml/badge.svg)](https://github.com/avalyset/khepri/actions/workflows/ci.yml)
 
 Khepri is a reproducible, per–bidding-zone carbon-intensity (CI) dataset and method for the nine Nordic electricity bidding zones — **NO1–NO5** (Norway) and **SE1–SE4** (Sweden) — for use in carbon-aware computing. Carbon intensity is derived deterministically from:
@@ -30,7 +31,7 @@ The method is production-based and spans a data core, multi-year drift character
 
 ## Method
 
-Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0008) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
+Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The method is described in full in [arXiv:2608.29717](https://arxiv.org/abs/2608.29717). The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0008) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
 
 Carbon intensity is production-based: it weights the generation produced within a zone. Consumption-based flow-tracing (imports and exports) and marginal emissions are not implemented; they are a separate, later layer.
 
