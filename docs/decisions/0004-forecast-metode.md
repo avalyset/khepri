@@ -86,8 +86,10 @@ final evaluation.
   into the adoption layer.
 - Does not beat: SARIMA/seasonality is sufficient, simplifying adoption (reported
   straight).
-- NO becomes the first published per-zone CI forecast with the field's evaluation
-  convention (CarbonCast-comparable), filling the file-verified gap.
+- NO gives a per-zone CI forecast under the field's evaluation convention
+  (CarbonCast-comparable). No per-bidding-zone NO treatment was found in the
+  peer-reviewed literature surveyed - stated as a coverage finding, not a
+  priority claim.
 
 ## Alternatives considered
 - 48h horizon (earlier guess): rejected — the field uses 96h; comparability requires

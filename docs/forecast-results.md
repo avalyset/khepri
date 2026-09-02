@@ -67,7 +67,7 @@ ADR-0004 Decision 3 (low→high): SARIMA is the sweet spot.
 ### 5. Field comparability achieved (secondary)
 NO's H2-2021 MAPE (1.2-10.5) is in **the same room as CarbonCast's regions** (SE
 5.78 lifecycle, PJM 4.80, ISO-NE 6.46, CISO 13.37). NO is now forecast-
-characterised on field-comparable grounds — first per-zone NO CI forecast with the
+characterised on field-comparable grounds — per-zone NO CI forecast - no per-bidding-zone NO treatment was found in the peer-reviewed literature surveyed, but this is stated as a coverage finding, not a priority claim - with the
 field's evaluation convention.
 
 ## Caveats

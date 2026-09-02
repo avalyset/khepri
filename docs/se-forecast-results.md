@@ -44,9 +44,11 @@ Comparison is per-zone vs country-aggregate — not directly equivalent.
 
 ## Positioning
 
-First per-bidding-zone SE1-SE4 CI forecast (granularity novelty).
+Per-zone SE1-SE4 forecast. NOT a first: Engstam et al. (2023) and Papageorgiou
+et al. (2020) publish per-bidding-zone Swedish emission factors, and Electricity
+Maps covers all nine Nordic zones hourly.
 CarbonCast and EnsembleCI cover SE as country aggregate only (verified).
-NEVER "first SE CI forecast" (aggregate exists).
+NEVER any "first" claim - per-zone SE factors are already published.
 SE annual cross-zone spread — the gap between a country's cleanest and dirtiest
 zone in a given year, over 2022-2025 — 5.6-8.0 gCO2eq/kWh vs NO 16.7-30.7
 gCO2eq/kWh (ADR-0006).

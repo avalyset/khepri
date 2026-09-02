@@ -5,7 +5,7 @@ Date: 2026-06-29
 Builds on: ADR-0004 (NO forecast), ADR-0006 (SE per-zone CI), ADR-0007 (SE drift)
 
 ## Context
-SE per-zone CI (SE1-SE4) has been computed (ADR-0006) and drift-characterized (ADR-0007). The forecast layer produces per-zone 96-hour CI forecasts using the same method as NO (ADR-0004). Per-zone SE forecasting does not exist in the field: CarbonCast and EnsembleCI cover SE only as a country aggregate (verified against their data/ directories). Novelty comes from granularity (per bidding zone), not signal strength — SE is less distinct than NO (ADR-0006: annual cross-zone spread — the gap between a country's cleanest and dirtiest zone in a given year, over 2022-2025 — 5.6-8.0 gCO2eq/kWh for SE vs 16.7-30.7 gCO2eq/kWh for NO), and it is nowhere claimed that SE is a stronger artifact than NO.
+SE per-zone CI (SE1-SE4) has been computed (ADR-0006) and drift-characterized (ADR-0007). The forecast layer produces per-zone 96-hour CI forecasts using the same method as NO (ADR-0004). CarbonCast and EnsembleCI cover SE only as a country aggregate (verified against their data/ directories), but per-zone SE emission factors are not new in the field: Engstam et al. (2023) and Papageorgiou et al. (2020) both report per-bidding-zone Swedish factors, and Electricity Maps publishes all nine Nordic zones hourly. What is ours is the archived, versioned artefact, not priority and not signal strength — SE is less distinct than NO (ADR-0006: annual cross-zone spread — the gap between a country's cleanest and dirtiest zone in a given year, over 2022-2025 — 5.6-8.0 gCO2eq/kWh for SE vs 16.7-30.7 gCO2eq/kWh for NO), and it is nowhere claimed that SE is a stronger artifact than NO.
 
 ## Decision
 
@@ -31,7 +31,7 @@ This ADR pre-approves the comparison METHOD, not its conclusion:
 H0: per-zone SE CI does not require heavy ML beyond SARIMA/persistence for a usable 96h forecast — i.e. a heavy model (GBM) does not meaningfully beat a SARIMA/seasonal baseline. This is a falsifiable methodological claim about the field's model choice, not a magnitude claim. The materiality threshold for "meaningful improvement" is inherited from ADR-0004 (no new degree of freedom introduced here). A negative result (heavy ML needed / baseline insufficient) is an equally real and reportable finding. The outcome is not assumed before the run.
 
 ## Positioning (applies to all output from this layer)
-First per-bidding-zone SE1-SE4 CI forecast (granularity novelty, verified against aggregate coverage at CarbonCast/EnsembleCI). NEVER "first SE CI forecast" (aggregate exists). NEVER "stronger/richer than NO". The magnitude claim is dead.
+NEVER a "first" of any kind. Per-zone SE1-SE4 emission factors are already published (Engstam et al. 2023; Papageorgiou et al. 2020; Electricity Maps). CarbonCast/EnsembleCI cover SE as aggregate only - that is a coverage fact, not a priority claim. NEVER "stronger/richer than NO". The magnitude claim is dead.
 
 ## B3 caveat
 The effective training window is short: 2 years (2022-2023) for training. For a 96h horizon the relevant seasonal structure is primarily diurnal/weekly (captured by 2 years), but annual seasonality is weakly estimable. Reported as a limitation, not hidden. Results are interpreted within this window.

@@ -48,9 +48,13 @@ set, and the method handles new types without change.
 ### 5. Contribution — honest positioning (B3)
 - Data-core + per-zone drift SE1-SE4: genuinely new (no one has per-zone, only
   aggregate).
-- Forecast: claimed as "first per-bidding-zone SE1-SE4 CI forecast", NEVER as
-  "first SE CI forecast" (CarbonCast has SE aggregate). Per-zone granularity is
-  what is new.
+- Forecast: NEVER claimed as a "first". Engstam et al. (2023, Energy Conversion
+  and Management 293:117458) model SE1-SE4 individually at hourly resolution for
+  2018-2021 with generation-based AEF, and Electricity Maps publishes all nine
+  Nordic zones hourly. Papageorgiou et al. (2020, Applied Energy 268:114981)
+  report per-bidding-area factors for 2018 (assessed from abstract and figures;
+  full text unavailable). What is ours is the archived, versioned, recomputable
+  artefact - not priority.
 - codecarbon gap-fill: genuinely independent of forecasting (the placeholder is
   equally wrong for SE).
 
@@ -60,8 +64,8 @@ set, and the method handles new types without change.
   spread — the gap between a country's cleanest and dirtiest zone in a given year,
   over 2022–2025 — is narrower for SE (5.6–8.0 gCO2eq/kWh) than for NO
   (16.7–30.7 gCO2eq/kWh). The magnitude claim was dropped
-  after the data core (see ADR-0008); the SE contribution is granularity (first
-  per-bidding-zone SE), not signal strength.
+  after the data core (see ADR-0008); the SE contribution is an archived,
+  recomputable per-zone artefact, not priority and not signal strength.
 - Same reproducibility, ADR chain, DOI discipline as NO.
 - Separate codecarbon PR (parallel to #1260) for SE1-SE4.
 
