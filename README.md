@@ -8,7 +8,7 @@ Khepri is a reproducible, per–bidding-zone carbon-intensity (CI) dataset and m
 - **ENTSO-E** Actual Generation per Production Type (A75), per bidding zone, and
 - **IPCC AR5 Annex III** lifecycle emission factors.
 
-The method is production-based and spans a data core, multi-year drift characterisation, and 96-hour per-zone forecasts. It provides the first per–bidding-zone SE1–SE4 CI signal; the Swedish contribution is per-zone granularity, and the cross-zone spread is narrower in Sweden (5.6–8.0 gCO2eq/kWh) than in Norway (16.7–30.7).
+The method is production-based and spans a data core, multi-year drift characterisation, and 96-hour per-zone forecasts. It provides the first per–bidding-zone SE1–SE4 CI signal; the Swedish contribution is per-zone granularity, and the annual cross-zone spread — the gap between a country's cleanest and dirtiest zone in a given year, over 2022–2025 — is narrower in Sweden (5.6–8.0 gCO2eq/kWh) than in Norway (16.7–30.7 gCO2eq/kWh).
 
 ## What it replaces
 

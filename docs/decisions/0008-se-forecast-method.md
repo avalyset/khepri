@@ -5,7 +5,7 @@ Date: 2026-06-29
 Builds on: ADR-0004 (NO forecast), ADR-0006 (SE per-zone CI), ADR-0007 (SE drift)
 
 ## Context
-SE per-zone CI (SE1-SE4) has been computed (ADR-0006) and drift-characterized (ADR-0007). The forecast layer produces per-zone 96-hour CI forecasts using the same method as NO (ADR-0004). Per-zone SE forecasting does not exist in the field: CarbonCast and EnsembleCI cover SE only as a country aggregate (verified against their data/ directories). Novelty comes from granularity (per bidding zone), not signal strength — SE is less distinct than NO (ADR-0006: cross-zone spread 5.6-8.0 vs NO 16.7-30.7), and it is nowhere claimed that SE is a stronger artifact than NO.
+SE per-zone CI (SE1-SE4) has been computed (ADR-0006) and drift-characterized (ADR-0007). The forecast layer produces per-zone 96-hour CI forecasts using the same method as NO (ADR-0004). Per-zone SE forecasting does not exist in the field: CarbonCast and EnsembleCI cover SE only as a country aggregate (verified against their data/ directories). Novelty comes from granularity (per bidding zone), not signal strength — SE is less distinct than NO (ADR-0006: annual cross-zone spread — the gap between a country's cleanest and dirtiest zone in a given year, over 2022-2025 — 5.6-8.0 gCO2eq/kWh for SE vs 16.7-30.7 gCO2eq/kWh for NO), and it is nowhere claimed that SE is a stronger artifact than NO.
 
 ## Decision
 

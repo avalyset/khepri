@@ -47,7 +47,9 @@ Comparison is per-zone vs country-aggregate — not directly equivalent.
 First per-bidding-zone SE1-SE4 CI forecast (granularity novelty).
 CarbonCast and EnsembleCI cover SE as country aggregate only (verified).
 NEVER "first SE CI forecast" (aggregate exists).
-SE cross-zone spread 5.6-8.0 gCO2eq/kWh vs NO 16.7-30.7 (ADR-0006).
+SE annual cross-zone spread — the gap between a country's cleanest and dirtiest
+zone in a given year, over 2022-2025 — 5.6-8.0 gCO2eq/kWh vs NO 16.7-30.7
+gCO2eq/kWh (ADR-0006).
 
 ## SE1/SE2 concordance limitation — direction tracking
 
