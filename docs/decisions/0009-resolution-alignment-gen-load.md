@@ -1,14 +1,31 @@
 # ADR-0009: Resolution alignment of generation and load (gen/load grid)
 
-- **Status:** Proposed
+- **Status:** **Superseded by [ADR-0010](0010-balansering-forbrukslag.md)** (2026-09-02)
 - **Date:** 2026-07-09
 - **Builds on:** [ADR-0001](0001-ci-beregningsmetode.md) (production-based, duration-weighted CI), [ADR-0002](0002-nan-materialitetsterskel.md) (NaN = genuinely missing, not zero).
 
-> **This ADR is Proposed, not Accepted.** It documents a resolution mismatch and
-> lays out the alignment options, but does **not** pick one. The choice is gated on
-> the external zonal flow-tracing / balancing method (expected next week): the
-> consumption-CI layer must inherit the *same* balancing grid for consistency, so
-> the resolution decision is deferred until that method's native resolution is known.
+> **Superseded 2026-09-02. The question this ADR waited on has no object.**
+>
+> The text below defers the resolution choice until the native resolution of the
+> external zonal flow-tracing / balancing method is known. That method does not
+> exist. Per Schäfer (INATECH, 2026-09-02): *"Aggregated coupling flow tracing does
+> not need any balancing, since the tracing works on net positions (derived from
+> flows), and the results are multiplied by generation shares."* The same reply
+> states that aggregated tracing *"only provides the mix of net imports"*, not a
+> consumption mix, and that any consumption mix requires balancing we perform
+> ourselves.
+>
+> Two consequences. The gating condition cannot be met, because there is no
+> external balancing grid to inherit. And the dependency runs the other way: our
+> own balancing choice determines which gen/load grid we need, not the reverse.
+> That choice is the subject of [ADR-0010](0010-balansering-forbrukslag.md).
+>
+> **What still stands.** Everything below that is our own measurement on our own
+> extract: the per-zone resolution matrix, the switch dates, the DK-isolated
+> alignment break, the DST verification, and the genuine data holes. Those are
+> unaffected by anything in the reply and are carried into ADR-0010 unchanged.
+> Options (A), (B) and (C) also stand as the available paths — they are simply
+> decided on our own grounds now, downstream of the balancing choice.
 
 ## Context
 
