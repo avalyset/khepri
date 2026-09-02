@@ -10,10 +10,12 @@ Metrics per (zone, model, split, day-horizon): MAPE (mean/median/90th/95th pct),
 MAE, RMSE, concordance index (LiteCast, ranking relevance for scheduling).
 
 NO4 EXPECTATION (pre-registered, ADR-0004 correction): NO4's large CI movements
-track a step change in its fossil-gas share (near zero in 2021, 6.23% in 2024,
-3.63% in 2025), not a smooth trend. A model should NOT be able to predict these
-steps from CI history alone. High NO4 skill across the step boundaries =>
-suspect leakage, not skill.
+track a non-monotone change in its fossil-gas share (0.07% of the mix in 2021,
+6.23% in 2024, 3.63% in 2025), not a smooth trend. What moved the share is not
+attributable to any individual facility from our input: ENTSO-E reports
+generation per production type, not per plant. A model should NOT be able to
+predict these steps from CI history alone. High NO4 skill across the step
+boundaries => suspect leakage, not skill.
 """
 
 import os

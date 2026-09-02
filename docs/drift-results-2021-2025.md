@@ -56,13 +56,16 @@ no external attribution is made here.
 ### Correction (R15 / B3)
 An earlier draft (commit 1ac6b96, pushed) described NO4 as a "Melkøya gas ramp
 2022-24" and 2021 as "no gas column". Both are wrong: gas existed (~194 MW) in
-2019, and the 2021 low point is a fire-driven outage, not a baseline. Drift
-analysis on 2021-2025 alone misread the 2021 anomaly as the starting point;
-pre-2021 data revealed the error. **The drift figures themselves (CI per year, H0
-rejected for NO4) stand — only the causal explanation is corrected: event-driven
-outage/recovery, not structural growth.** Consequence for forecast: NO4's "drift"
-is an unpredictable industrial event (fire), not a smooth trend — harder to
-forecast than seasonality.
+2019, and the 2021 low point is a non-monotone dip below that level, not a
+baseline. Drift analysis on 2021-2025 alone misread the 2021 anomaly as the
+starting point; pre-2021 data revealed the error. **The drift figures themselves
+(CI per year, H0 rejected for NO4) stand — only the causal explanation is
+corrected: a non-monotone change in the fossil-gas share (0.07% of the mix in
+2021, 6.23% in 2024, 3.63% in 2025), not structural growth.** What moved the
+share is not attributable to any individual facility from our input: the ENTSO-E
+extract reports generation per production type, not per plant. Consequence for
+forecast: NO4's "drift" is a non-monotone shift in one production type, not a
+smooth trend — harder to forecast than seasonality.
 
 ## Verdict (H0: stable signal, prior-year CI a good proxy)
 
@@ -82,9 +85,9 @@ baseline (~24) as gas is phased out.
 Confirmed against 2019-2020 data (same sanity that revealed the NO4 error): NO5
 gas was a steady ~80 MW in 2019-2021, then a monotonic decline 2022→2025 (32→7→2
 MW). This is a **genuine trend**, not a 2021 anomaly. Both gas-driven outliers thus
-have DIFFERENT mechanisms: NO4 = V-shape (fire-driven outage + recovery), NO5 =
-monotonic phase-out. The earlier "mirror-image" description was imprecise — what
-they share is that gas is the driver.
+have DIFFERENT mechanisms: NO4 = V-shape (non-monotone gas-share dip and return),
+NO5 = monotonic phase-out. The earlier "mirror-image" description was imprecise —
+what they share is that gas is the driver.
 
 | Year | Fossil Gas % | CI | Hydro % | Total (TWh) | Coverage |
 |----|-----:|-----:|-----:|-----:|-----:|
