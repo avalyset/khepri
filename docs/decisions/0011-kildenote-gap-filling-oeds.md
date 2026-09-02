@@ -17,7 +17,7 @@ cite it. It takes no position on whether the filling is appropriate.
 ## The rules, as coded
 
 `exchange_analysis/utils.py:799-834`, `default_rules`. The default is `ZERO`
-(line 805); more specific rules override it in this order:
+(line 804); more specific rules override it in this order:
 
 | Method | Condition | Line |
 |---|---|---|
@@ -38,7 +38,7 @@ gap longer than three hours that is not covered by `WEEK_BEFORE`, becomes zero.
 
 `exchange_analysis/utils.py:937-976`, `patch_gaps_with_dayahead`. For physical
 flow gaps **longer than one week** (`min_gap_length = pd.Timedelta(weeks=1)`,
-line 944), the missing block is replaced with the corresponding day-ahead
+line 943), the missing block is replaced with the corresponding day-ahead
 commercial schedule from `{bz}_raw_commercial_flows_dayahead` (lines 958-968) and
 tagged `DAYAHEAD_PROXY`.
 
