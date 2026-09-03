@@ -8,7 +8,11 @@ abstract: >-
   published lifecycle emission factors (IPCC AR5 Annex III). Includes
   multi-year drift analysis and 96-hour per-zone forecasts for all nine zones
   in the CarbonCast/EnsembleCI evaluation convention, with a full ADR chain
-  (0001–0008). First per-bidding-zone SE1–SE4 CI signal (granularity novelty).
+  (0001–0009). Per-zone Swedish emission factors are already published
+  (Engstam et al. 2023; Papageorgiou et al. 2020); no per-bidding-zone
+  treatment of NO1–NO5 was found in the peer-reviewed literature surveyed.
+  The contribution is the archived, versioned and recomputable artifact on
+  one audited factor base, not priority.
 type: software
 authors:
   - family-names: "Botten Nicolaysen"
@@ -16,8 +20,8 @@ authors:
     orcid: "https://orcid.org/0009-0001-9188-6788"
 repository-code: "https://github.com/avalyset/khepri"
 license: [Apache-2.0, CC-BY-4.0]
-version: "1.2.0"
-date-released: "2026-07-01"
+version: "1.3.0"
+date-released: "2026-09-03"
 doi: 10.5281/zenodo.21042581
 identifiers:
   - type: doi

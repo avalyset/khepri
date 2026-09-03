@@ -9,11 +9,11 @@ Khepri is a reproducible, per–bidding-zone carbon-intensity (CI) dataset and m
 - **ENTSO-E** Actual Generation per Production Type (A75), per bidding zone, and
 - **IPCC AR5 Annex III** lifecycle emission factors.
 
-The method is production-based and spans a data core, multi-year drift characterisation, and 96-hour per-zone forecasts. It provides the first per–bidding-zone SE1–SE4 CI signal; the Swedish contribution is per-zone granularity, and the cross-zone spread is narrower in Sweden (5.6–8.0 gCO2eq/kWh) than in Norway (16.7–30.7).
+The method is production-based and spans a data core, multi-year drift characterisation, and 96-hour per-zone forecasts. Per-zone Swedish emission factors are not new — Engstam et al. (2023, [doi:10.1016/j.enconman.2023.117458](https://doi.org/10.1016/j.enconman.2023.117458)) model SE1–SE4 hourly for 2018–2021, and Papageorgiou et al. (2020, [doi:10.1016/j.apenergy.2020.114981](https://doi.org/10.1016/j.apenergy.2020.114981)) report them by Swedish bidding area for 2018. No per–bidding-zone treatment of the Norwegian zones NO1–NO5 was found in the peer-reviewed literature surveyed. What this artifact adds on both sides of the border is the same archived, versioned and recomputable series on one audited factor base; the cross-zone spread is narrower in Sweden (5.6–8.0 gCO2eq/kWh) than in Norway (16.7–30.7).
 
 ## What it replaces
 
-[codecarbon](https://github.com/mlco2/codecarbon) assigns a single static value of **18.0 gCO2eq/kWh to every Norwegian and Swedish bidding zone** (`nordic_emissions.json`, verified against v3.2.8). This value is inaccurate for every zone and in both directions: too low for most zones — about **2.2× too low for NO4** — and too high for the nuclear-dominated zone SE3, whose 2025 CI is 14.53. Khepri provides distinct, source-traceable per-zone values.
+[codecarbon](https://github.com/mlco2/codecarbon) assigns a single static value of **18.0 gCO2eq/kWh to every Norwegian and Swedish bidding zone** (`nordic_emissions.json`, verified against v3.2.8). On the AR5 basis this file publishes, that value is wrong in both directions: too low for seven zones — about **2.2× too low for NO4** — and too high for SE3 (14.53) and SE4 (17.42). On codecarbon's *own* factor table the picture is one-directional: every one of the nine zones lands above 18.0, between 24.7 and 51.7, so there the placeholder is too low everywhere. The two statements are each true of their own basis and neither is true of the other; see [ADR-0009](docs/decisions/0009-baering-i-nevner-for-codecarbon.md). Khepri provides distinct, source-traceable per-zone values on both.
 
 ## 2025 per-zone values (gCO2eq/kWh)
 
@@ -31,7 +31,7 @@ The method is production-based and spans a data core, multi-year drift character
 
 ## Method
 
-Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The method is described in full in [arXiv:2608.29717](https://arxiv.org/abs/2608.29717). The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0008) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
+Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The method is described in full in [arXiv:2608.29717](https://arxiv.org/abs/2608.29717). The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0009) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
 
 Carbon intensity is production-based: it weights the generation produced within a zone. Consumption-based flow-tracing (imports and exports) and marginal emissions are not implemented; they are a separate, later layer.
 
@@ -45,7 +45,7 @@ Carbon intensity here is production-based and does not capture consumption-based
 
 ## Adoption
 
-The per-zone values are contributed upstream to codecarbon in two pull requests — NO ([#1260](https://github.com/mlco2/codecarbon/pull/1260)) and SE ([#1262](https://github.com/mlco2/codecarbon/pull/1262)); the SE one covers the two-way placeholder error. Both are under review — see the links for current status. The values are citable from this archived artifact independently of the pull requests.
+The per-zone values are contributed upstream to codecarbon in two pull requests — NO ([#1260](https://github.com/mlco2/codecarbon/pull/1260)) and SE ([#1262](https://github.com/mlco2/codecarbon/pull/1262)). Those values are **not** the AR5 figures tabulated above: at the maintainer's request they are re-derived on codecarbon's own factor table, with unfactored generation carried in the denominator at zero so the shipped number is a complete factor over all generation (ADR-0009). Both are under review — see the links for current status. The values are citable from this archived artifact independently of the pull requests.
 
 ## Reproduce
 
@@ -63,7 +63,7 @@ export KHEPRI_RAW=/path/to/entsoe-csvs
 PYTHONPATH=src python -c "import khepri.ci as ci; ci.run_all()"   # per-zone interval CI (2025)
 ```
 
-The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `forecast.py`); the emission factors are in `factors.py`. The method for each step is fixed in the ADRs under `docs/decisions/`.
+The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `forecast.py`); the emission factors are in `factors.py`, and the codecarbon-basis mapping used for the upstream delivery is in `codecarbon_map.py`. The method for each step is fixed in the ADRs under `docs/decisions/`.
 
 ## License
 
@@ -72,4 +72,4 @@ The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `fo
 
 ## Status
 
-Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). Adoption pull requests are open for NO (#1260) and SE (#1262). The consumption-based layer is not implemented. The current release is version 1.2.0; the concept DOI resolves to the latest archived version.
+Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). Adoption pull requests are open for NO (#1260) and SE (#1262). The consumption-based layer is not implemented. The current release is version 1.3.0; the concept DOI resolves to the latest archived version.

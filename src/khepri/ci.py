@@ -63,12 +63,34 @@ def _durations_hours(index):
     return pd.Series(dur, index=index)
 
 
-def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
-    """Energy-weighted, duration-correct, NaN-excluded CI for one zone (ADR-0001+0002)."""
+def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR,
+            carry_unfactored_at_zero=False):
+    """Energy-weighted, duration-correct, NaN-excluded CI for one zone (ADR-0001+0002).
+
+    Args:
+        df: Generation per production type (MW), one column per type.
+        factors: ENTSO-E type -> gCO2eq/kWh. Defaults to the AR5 table.
+        excluded: Types to leave out of the primary CI entirely (ADR-0001).
+        carry_unfactored_at_zero: When True, production types with no factor are
+            kept in the DENOMINATOR at factor 0 instead of being dropped from
+            both sides. The CI then answers "gCO2eq per kWh of all generation"
+            rather than "per kWh of the generation we have factors for".
+
+            Default False, so the archived v1.2 figures reproduce unchanged.
+            Set True only for a consumer that applies the number to all energy —
+            see ADR-0009 for why the codecarbon delivery does exactly that.
+            Enabling it always lowers or leaves the CI unchanged, never raises
+            it, since it adds to the denominator and nothing to the numerator.
+    """
     occurring = list(df.columns)
     included = [c for c in occurring if c in factors and c not in excluded]
     missing_factor = [c for c in occurring
                       if c not in factors and c not in excluded]
+
+    # Types with no factor at all. Under ADR-0001 they leave the calculation;
+    # under ADR-0009 they stay in the denominator contributing zero emissions.
+    unfactored = [c for c in occurring if c not in included]
+    denominator_types = occurring if carry_unfactored_at_zero else included
 
     # ADR-0002: materiality per included type (against the pre-registered threshold).
     zone_total_mean = float(df[occurring].mean().sum())  # zone's total mix (mean MW)
@@ -90,8 +112,14 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
     g = sub.clip(lower=0)                  # MW per included type, clean intervals
     d = dur[clean]                        # hours
     energy = g.mul(d, axis=0)            # MWh per type
-    tot_energy = float(energy.to_numpy().sum())
+
+    # The numerator is always the factor-carrying types — an unfactored type
+    # contributes no emissions either way. Only the denominator moves.
     emis = float(sum(energy[c] * factors[c] for c in included).sum())  # ∝ gCO2
+    denom_energy = (
+        df[denominator_types][clean].fillna(0.0).clip(lower=0).mul(d, axis=0)
+    )
+    tot_energy = float(denom_energy.to_numpy().sum())
     ci = emis / tot_energy if tot_energy > 0 else float("nan")
 
     # interval CI for min/max
@@ -100,7 +128,14 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
     ici = (erate / gsum).replace([float("inf"), float("-inf")], pd.NA).dropna()
 
     # energy-weighted mix share over ALL occurring types (clean intervals)
-    all_energy = df[occurring][clean].clip(lower=0).mul(d, axis=0)
+    # .fillna(0.0) before summing, exactly as the numerator does above. Without
+    # it a single NaN in ANY occurring type — including an excluded one the CI
+    # never touches — poisons all_tot, and both `mix_pct` and
+    # `included_energy_share_pct` come back NaN for the whole zone. That is what
+    # v1.2 did for NO2 and NO3 (a NaN in Waste / Other), and it is why NO4's
+    # 2021 gas share read NaN rather than 0.07 %. ADR-0002 already says a NaN in
+    # a negligible type is a zero, not data loss; this makes the mix obey it.
+    all_energy = df[occurring][clean].fillna(0.0).clip(lower=0).mul(d, axis=0)
     all_tot = float(all_energy.to_numpy().sum())
     mix = (all_energy.sum() / all_tot * 100).sort_values(ascending=False)
     included_share = energy.to_numpy().sum() / all_tot * 100 if all_tot else float("nan")
@@ -116,6 +151,8 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR):
         "material": material,
         "negligible": negligible,
         "missing_factor": missing_factor,
+        "unfactored": unfactored,
+        "carried_at_zero": bool(carry_unfactored_at_zero),
         "included_energy_share_pct": included_share,
         "mix_pct": mix,
         "interval_ci": ici,
