@@ -43,6 +43,12 @@ finding (ADR-0003) and forecast finding (ADR-0004):
 - Honest limit stated: production-based NO CI is low and not very distinct between
   zones except where fossil gas occurs (NO4).
 
+> **Note added 2026-09-07.** The plant-level attribution above is retained as the original
+> decision record. It is not supported by the data: the ENTSO-E extract reports generation
+> per production type, not per plant. NO4 variability is stated as fossil gas share instead
+> (0.07 % 2021, 6.23 % 2024, 3.63 % 2025). See the correction section in
+> `docs/drift-results-2021-2025.md`.
+
 ### 4. Methodological transparency in the PR
 The PR states explicitly: (a) that this replaces the production fallback, not the
 Electricity Maps consumption-based primary path; (b) source (ENTSO-E + IPCC AR5,

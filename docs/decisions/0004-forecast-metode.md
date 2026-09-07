@@ -69,6 +69,12 @@ NOT "pre-gas": gas existed 2019-2020. The H2-2021 figure is for comparability, n
 drift evaluation, and NO4 is in an anomalously low-gas window (outage), not a
 normal regime.
 
+> **Note added 2026-09-07.** The plant-level attribution above is retained as the original
+> decision record. It is not supported by the data: the ENTSO-E extract reports generation
+> per production type, not per plant. NO4 variability is stated as fossil gas share instead
+> (0.07 % 2021, 6.23 % 2024, 3.63 % 2025). See the correction section in
+> `docs/drift-results-2021-2025.md`.
+
 Comparability is preserved on **metric/horizon/format** (MAPE, 96h day-wise,
 percentiles), not on test period. No leakage: the test set is not touched before
 final evaluation.
