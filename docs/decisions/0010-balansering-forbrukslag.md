@@ -2,7 +2,7 @@
 
 - **Status:** Proposed
 - **Date:** 2026-09-02
-- **Supersedes:** [ADR-0009](0009-resolution-alignment-gen-load.md) (gen/load resolution alignment)
+- **Supersedes:** [ADR-0012](0012-resolution-alignment-gen-load.md) (gen/load resolution alignment)
 - **Builds on:** [ADR-0001](0001-ci-beregningsmetode.md) (production-based, duration-weighted CI), [ADR-0002](0002-nan-materialitetsterskel.md) (NaN = genuinely missing, not zero).
 
 > **This ADR is Proposed, not Accepted.** It states what the upstream input
@@ -42,7 +42,7 @@ mixes."*
 
 The delivered measure is a **net-import mix**, not a consumption mix. Turning one
 into the other requires closing generation, load and net flows per zone, and that
-closure is a modelling choice we own. ADR-0009 assumed the choice was inherited
+closure is a modelling choice we own. ADR-0012 assumed the choice was inherited
 from upstream; it is not.
 
 ## Decision (Proposed — the balancing choice, open)
@@ -63,7 +63,7 @@ vector so the zone balances.
   CI is derived from (ADR-0001). The two layers would then rest on different
   generation numbers unless that is stated.
 - **Binds us to:** the grid the **load** is reported on. For DK after 2025-04-08
-  that is 60-min, per the matrix carried over from ADR-0009.
+  that is 60-min, per the matrix carried over from ADR-0012.
 - **Precedent, not recommendation:** this is what INATECH do for *direct*
   coupling flow tracing — *"here we usually take flows and load as given and
   scale the generation for the balancing"* (Schäfer, 2026-09-02). Their direct
@@ -100,20 +100,20 @@ fixed before computation.
 ## Consequences
 
 - **The balancing choice determines the resolution choice, not the reverse.**
-  ADR-0009 deferred the gen/load resolution decision until an upstream method was
+  ADR-0012 deferred the gen/load resolution decision until an upstream method was
   known. With no upstream balancing to inherit, the order is inverted: whichever
   family is chosen here fixes which series is authoritative, and that fixes the
-  grid. Options (A), (B) and (C) from ADR-0009 remain available and are decided
+  grid. Options (A), (B) and (C) from ADR-0012 remain available and are decided
   downstream of this ADR.
 - **The resolution matrix stands.** Per-zone native resolutions, the 60→15-min
   switch dates, the DK-isolated alignment break, the DST verification and the
   genuine data holes are our own measurements on our own extract and are carried
-  over from ADR-0009 unchanged.
+  over from ADR-0012 unchanged.
 - **The upstream input carries gap-filled values.** See
   [ADR-0011](0011-kildenote-gap-filling-oeds.md); any layer built on the delivered
   data must state the gap method.
 - Whichever family is chosen must be declared per zone in the method note, with
-  the same explicitness ADR-0009 required for the resolution choice.
+  the same explicitness ADR-0012 required for the resolution choice.
 
 ## Alternatives considered
 

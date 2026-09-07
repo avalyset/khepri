@@ -1,7 +1,8 @@
-# ADR-0009: Resolution alignment of generation and load (gen/load grid)
+# ADR-0012: Resolution alignment of generation and load (gen/load grid)
 
 - **Status:** **Superseded by [ADR-0010](0010-balansering-forbrukslag.md)** (2026-09-02)
 - **Date:** 2026-07-09
+- **Renumbered:** 2026-09-07, from ADR-0009. The number 0009 was taken on `main` by `0009-baering-i-nevner-for-codecarbon.md`, which is frozen in tag v1.3 and cannot move. This document was only ever on `v2-dev-dk-fi`. Superseding ADR (0010) therefore carries a lower number than the document it supersedes.
 - **Builds on:** [ADR-0001](0001-ci-beregningsmetode.md) (production-based, duration-weighted CI), [ADR-0002](0002-nan-materialitetsterskel.md) (NaN = genuinely missing, not zero).
 
 > **Superseded 2026-09-02. The question this ADR waited on has no object.**

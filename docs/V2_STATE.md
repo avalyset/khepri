@@ -25,15 +25,17 @@ as the substrate for a later **consumption-based CI** layer. Iceland is out of s
 ## What is decided vs gated
 
 - **Done & verified:** DK1/DK2/FI production-based CI (2025); demand/load for all 12
-  zones (2025); load↔generation resolution alignment characterised (ADR-0009).
+  zones (2025); load↔generation resolution alignment characterised (ADR-0012).
 - **Gated (data received, unusable as-is):** consumption-based CI. The external zonal
   flow-tracing dataset (2025) arrived from INATECH Freiburg but was **truncated at the
   2^20 Excel row cap** (~1–15 Jan 2025, ~42% of series cut) — unusable as-is; an
   un-truncated re-export (Parquet/chunked) has been requested. The **balancing method**
-  is still pending, so the resolution choice (ADR-0009) stays **Proposed** until that
-  method's native grid is known — the consumption layer must inherit the same balancing
-  grid. Sub-state advanced (awaiting-data → data-received-but-unusable, ball with the
-  partner); the gate itself is unchanged.
+  is ours to choose, not inherited: ADR-0012 waited on an external balancing grid that
+  does not exist, and was **Superseded by ADR-0010** on 2026-09-02. The resolution choice
+  is now downstream of the balancing choice, and ADR-0010 is **Proposed** — the
+  consumption layer follows once that choice is made. Sub-state advanced
+  (awaiting-data → data-received-but-unusable, ball with the partner); the gate
+  itself is unchanged.
 - **Not in Khepri-Nordic scope:** cross-border flows/exchanges (partner's layer), marginal
   emissions.
 
@@ -45,7 +47,7 @@ Three commits; complete list of repo files touched:
 |--------|-------|------|
 | `898ec50` | `src/khepri/ci.py`, `src/khepri/factors.py` | `run_all(zones, year)` parametrised (default NO = v1 repro); `ZONES_V2_ADDED=[DK1,DK2,FI]`. `Fossil Peat` excluded + flagged sensitivity proxy. |
 | `91ddc6b` | `src/khepri/factors.py` | Peat proxy relabelled a **floor** not a ceiling (value 820 unchanged; label/comment only). |
-| `6a863ca` | `docs/decisions/0009-resolution-alignment-gen-load.md` | ADR-0009 (Proposed). |
+| `6a863ca` | `docs/decisions/0012-resolution-alignment-gen-load.md` | Added as ADR-0009; renumbered to ADR-0012 on 2026-09-07. Superseded by ADR-0010 (2026-09-02). |
 
 The compute method is zone-agnostic (`ci.compute(df)`); only orchestration lists
 zones. Fetch/compute/align **drivers and all raw/derived data live outside git** in
@@ -79,7 +81,7 @@ All load + aligned-load CSVs (12 zones) and DK/FI generation live in the working
 area `~/khepri-data/v2-dk-fi/`. NO/SE generation stays in its v1 canonical location;
 `align_load.py` reads generation from the correct per-family path.
 
-## Resolution matrix (empirical, ADR-0009)
+## Resolution matrix (empirical, ADR-0012)
 
 Native resolution shifts mid-2025 (pan-European 15-min ISP rollout), on **different
 dates per zone/data-type**. Measured from timestamp deltas, not assumed.
@@ -101,15 +103,17 @@ dates per zone/data-type**. Measured from timestamp deltas, not assumed.
 ## ADRs in force
 
 `0001`–`0008` **Accepted** (NO/SE CI, NaN threshold, drift, forecast, adoption, SE
-extension). `0009` **Proposed** — gen/load resolution alignment (decision deferred,
-see above).
+extension). `0012` **Superseded by `0010`** (2026-09-02) — gen/load resolution
+alignment; added as `0009` and renumbered on 2026-09-07, because `0009` is held on `main`
+by the codecarbon denominator ADR. `0010` **Proposed** — balancing for the consumption
+layer. `0011` **Accepted** — source note on gap-filling in the delivered OEDS dataset.
 
 ## What remains (next steps)
 
 1. Consumption-CI layer — **gated** on the balancing method (INATECH). Flow-tracing data (2025) received but truncated at the 2^20 row cap; un-truncated re-export requested.
-2. On arrival of the balancing method: resolve ADR-0009 (path A downsample gen→60min /
-   B upsample load→15min / C keep native separate) and move it to Accepted, declaring
-   the grid **per zone**.
+2. Decide the balancing choice: resolve ADR-0010, and with it the resolution paths
+   carried over from ADR-0012 (path A downsample gen→60min / B upsample load→15min /
+   C keep native separate), declaring the grid **per zone**.
 3. Optional: drift/forecast layers for DK/FI (currently NO/SE only; `drift.ZONES` is
    NO-only).
 

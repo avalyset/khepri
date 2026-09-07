@@ -30,7 +30,7 @@ The method is production-based and spans a data core, multi-year drift character
 
 ## Method
 
-Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0008) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
+Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0008), together with the consumption-layer work on this branch (ADR-0010 through ADR-0012; there is no ADR-0009 here, that number is held on `main` by the codecarbon denominator ADR) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
 
 Carbon intensity is production-based: it weights the generation produced within a zone. Consumption-based flow-tracing (imports and exports) and marginal emissions are not implemented; they are a separate, later layer.
 
