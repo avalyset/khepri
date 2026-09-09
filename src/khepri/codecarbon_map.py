@@ -112,7 +112,39 @@ NO_CODECARBON_CATEGORY: Set[str] = {
 }
 
 
-def codecarbon_factors(carry_unfactored: bool = True) -> Dict[str, float]:
+#: ENTSO-E fossil production types that codecarbon has NO key for.
+#:
+#: This is the category ADR-0009's zero-carrying rule was never meant to cover.
+#: Carrying an unfactored type at zero is defensible when the type is either
+#: low-carbon (Biomass, Marine) or genuinely unclassified (Other, Other
+#: renewable, Waste): the zero is then an admission of ignorance that dilutes
+#: the CI slightly and is reported through the coverage field. It is NOT
+#: defensible for a type we know to be fossil. A known-fossil column carried at
+#: zero does not express ignorance — it asserts, silently and wrongly, that the
+#: generation was clean.
+#:
+#: The Nordic case that exposes this is Finnish peat. See `docs/decisions/` and
+#: `~/khepri-data/rettelse/fi-femaar-resultat.txt` for the measured effect.
+#:
+#: None of these occur in NO1-NO5 or SE1-SE4 in any year of the published
+#: extract, which is why the published figures are unaffected.
+UNFACTORED_FOSSIL: Set[str] = {
+    "Fossil Peat",
+    "Fossil Brown coal/Lignite",
+    "Fossil Coal-derived gas",
+    "Fossil Oil shale",
+}
+
+
+class UnfactoredFossilError(ValueError):
+    """A known-fossil production type occurs with no factor and no decision."""
+
+
+def codecarbon_factors(
+    carry_unfactored: bool = True,
+    occurring=None,
+    fossil_decisions: Dict[str, float] = None,
+) -> Dict[str, float]:
     """
     Build the ENTSO-E-keyed factor table for a codecarbon-basis run.
 
@@ -122,9 +154,23 @@ def codecarbon_factors(carry_unfactored: bool = True) -> Dict[str, float]:
             denominator. When False, they are omitted from the table entirely
             and `ci.compute` will drop them from both numerator and denominator
             — the AR5-style treatment, useful for showing the difference.
+        occurring: The production types actually present in the extract, if
+            known. When given, any `UNFACTORED_FOSSIL` type among them that the
+            caller has not decided raises `UnfactoredFossilError`. Omit it only
+            for a zone already known to be free of those types; the delivery
+            path should always pass `df.columns`.
+        fossil_decisions: Explicit factor per `UNFACTORED_FOSSIL` type the
+            caller has taken a position on. The position must be stated here,
+            with its source, rather than falling out of a default.
 
     Returns:
         ENTSO-E production type -> gCO2eq/kWh, ready to pass as `factors=`.
+
+    Raises:
+        UnfactoredFossilError: `occurring` contains a known-fossil type with no
+            codecarbon key that `fossil_decisions` does not resolve. Failing
+            here is the point: the alternative is a silent zero that understates
+            the zone, which is what happens without this guard.
     """
     table = {
         entsoe: CODECARBON_FACTORS[key]
@@ -132,6 +178,27 @@ def codecarbon_factors(carry_unfactored: bool = True) -> Dict[str, float]:
     }
     if carry_unfactored:
         table.update({t: 0.0 for t in NO_CODECARBON_CATEGORY})
+
+    decided = dict(fossil_decisions or {})
+    stray = sorted(set(decided) - UNFACTORED_FOSSIL)
+    if stray:
+        raise ValueError(
+            "fossil_decisions may only name UNFACTORED_FOSSIL types; got "
+            + ", ".join(stray)
+        )
+
+    if occurring is not None:
+        undecided = sorted((set(occurring) & UNFACTORED_FOSSIL) - set(decided))
+        if undecided:
+            raise UnfactoredFossilError(
+                "known-fossil production type(s) with no codecarbon factor and no "
+                "decision from the caller: " + ", ".join(undecided) + ". "
+                "Carrying these at zero would assert the generation was clean. "
+                "Pass fossil_decisions={'<type>': <gCO2eq/kWh>} with the source "
+                "stated, or drop the zone."
+            )
+
+    table.update(decided)
     return table
 
 

@@ -33,6 +33,22 @@ OUT_DIR = os.environ.get("KHEPRI_OUT", os.path.expanduser("~/khepri-data/ci-2025
 MATERIAL_MIN_SHARE_PCT = 0.5
 MATERIAL_MIN_MW = 5.0
 
+#: ENTSO-E "production type" columns that are NOT generation.
+#:
+#: ENTSO-E's A75 payload carries a few columns that are not production at all.
+#: "Energy storage" is discharge from storage: the energy was generated earlier,
+#: by something else, and counting it again would double-count it — first where
+#: it was produced, then where it was released. It appears in FI from 2025.
+#:
+#: These are removed from `occurring` BEFORE the denominator is chosen, so they
+#: can never reach it, on either basis. That is deliberately stricter than
+#: carrying them at factor zero: a zero-carried column silently dilutes the CI,
+#: and for a non-generation column the dilution has no physical meaning.
+#:
+#: No zone in the published NO/SE 2025 extract contains any of these, so the
+#: archived v1.3 figures are unaffected — asserted in the test suite.
+NOT_GENERATION = frozenset({"Energy storage"})
+
 
 def ci_of_mix(mw_by_type, factors=FACTORS):
     """Pure function: CI (gCO2eq/kWh) for one instantaneous mix. Σ(MW*f)/Σ(MW).
@@ -64,7 +80,7 @@ def _durations_hours(index):
 
 
 def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR,
-            carry_unfactored_at_zero=False):
+            carry_unfactored_at_zero=False, not_generation=NOT_GENERATION):
     """Energy-weighted, duration-correct, NaN-excluded CI for one zone (ADR-0001+0002).
 
     Args:
@@ -81,8 +97,12 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR,
             see ADR-0009 for why the codecarbon delivery does exactly that.
             Enabling it always lowers or leaves the CI unchanged, never raises
             it, since it adds to the denominator and nothing to the numerator.
+        not_generation: Columns that are not generation at all and must not reach
+            the denominator on either basis. Defaults to `NOT_GENERATION`. Pass
+            an empty set to reproduce the pre-guard behaviour exactly.
     """
-    occurring = list(df.columns)
+    dropped_not_generation = [c for c in df.columns if c in not_generation]
+    occurring = [c for c in df.columns if c not in not_generation]
     included = [c for c in occurring if c in factors and c not in excluded]
     missing_factor = [c for c in occurring
                       if c not in factors and c not in excluded]
@@ -153,6 +173,7 @@ def compute(df, factors=FACTORS, excluded=EXCLUDED_NO_VERIFIED_FACTOR,
         "missing_factor": missing_factor,
         "unfactored": unfactored,
         "carried_at_zero": bool(carry_unfactored_at_zero),
+        "dropped_not_generation": dropped_not_generation,
         "included_energy_share_pct": included_share,
         "mix_pct": mix,
         "interval_ci": ici,
