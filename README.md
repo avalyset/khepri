@@ -31,7 +31,7 @@ The method is production-based and spans a data core, multi-year drift character
 
 ## Method
 
-Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The method is described in full in [arXiv:2608.29717](https://arxiv.org/abs/2608.29717). The full chain — data core, drift, forecast, adoption, and the SE extension (ADR-0001 through ADR-0009) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
+Each method choice is fixed in an architecture decision record (ADR) before computation, so the figures are verifiable rather than post-rationalised. The method is described in full in [arXiv:2608.29717](https://arxiv.org/abs/2608.29717). The full chain — data core, drift, forecast, adoption, and the SE extension, and the unfactored-fossil guard (ADR-0001 through ADR-0009 and ADR-0013) — is in [docs/decisions/](docs/decisions/). Result documents: [NO drift](docs/drift-results-2021-2025.md), [SE drift](docs/se-drift-results-2022-2025.md), [NO forecast](docs/forecast-results.md), [SE forecast](docs/se-forecast-results.md).
 
 Carbon intensity is production-based: it weights the generation produced within a zone. Consumption-based flow-tracing (imports and exports) and marginal emissions are not implemented; they are a separate, later layer.
 
@@ -72,4 +72,4 @@ The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `fo
 
 ## Status
 
-Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). Adoption pull requests are open for NO (#1260) and SE (#1262). The consumption-based layer is not implemented. The current release is version 1.3.0; the concept DOI resolves to the latest archived version.
+Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). The per-zone values were taken upstream into codecarbon: the maintainer folded the Swedish values into #1260 and merged it on 9 September 2026, #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The consumption-based layer is not implemented. The current release is version 1.4.0; the concept DOI resolves to the latest archived version.

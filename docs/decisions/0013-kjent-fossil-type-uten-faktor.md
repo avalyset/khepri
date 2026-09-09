@@ -31,9 +31,10 @@ Torv forekommer ikke i noen norsk eller svensk sone. Den forekommer i Finland,
 i alle fem årene 2021–2025, og Finland er allerede et felt i den leverte
 `nordic_emissions.json`.
 
-**Tallgrunnlag:** `~/khepri-data/rettelse/fi-femaar-resultat.txt` og
-`fi-femaar.json` (kjørt 2026-09-09 mot `FI_generation_{2021..2025}.csv` i
-`~/khepri-data/v2-dk-fi/`). Beregningen gjentas ikke her. Kort: den stille nullen
+**Tallgrunnlag:** en femårskjøring 2021–2025 med `khepri.ci.compute` på CodeCarbons
+faktortabell, mot ENTSO-E A75 for FI, kjørt 2026-09-09. ENTSO-E-uttrekkene
+redistribueres ikke — plattformens vilkår tillater det ikke — men hentes
+reproduserbart gjennom de dokumenterte API-spørringene. Kort: den stille nullen
 underdriver FI med rundt 40–50 % i hvert av de fem årene, og torvandelen faller
 gjennom perioden, så feilen krymper uten å forsvinne.
 
@@ -78,9 +79,9 @@ Tre veier ble vurdert.
   eksplisitt, av et menneske, med kilden skrevet ned. Beslutningen flyttes fra en
   default ingen ser, til et sted den er synlig i koden som kaller.
 
-Ingen publisert verdi flytter seg. Verifisert bit-identisk mot v1.3-grunnlinjen
-for alle ni soner, samme SHA256 over fullpresisjonsverdiene før og etter:
-`~/khepri-data/rettelse/baseline9-FOER.txt` og `-ETTER.txt`.
+Ingen publisert verdi flytter seg. Verifisert bit-identisk mot v1.3-grunnlinjen for
+alle ni soner, samme SHA256 over fullpresisjonsverdiene før og etter. Verdiene er
+pinnet i `tests/test_peat_guard.py`, som feiler på en ulp avdrift.
 
 ## Konsekvens: dekningsfeltet er ikke nok
 
@@ -115,4 +116,4 @@ arvet verdi på 72,0 som ikke er utledet av denne metoden.
 
 ADR-0009-teksten sier ikke at antakelsen finnes. Den bør få en setning som
 navngir den og peker hit. Det er en endring i `docs/decisions/0009-*.md`, ikke i
-noe publisert artefakt, og den er ikke gjort — se PLAN.md.
+noe publisert artefakt, og den er ikke gjort.
