@@ -62,6 +62,69 @@ typen ikke kan nå den på noen basis. Det er strengere enn å bære den på nul
 og med vilje: en null-båret kolonne fortynner stille, og for en ikke-produksjons-
 kolonne har fortynningen ingen fysisk betydning.
 
+### Systemgrense C: torv gis ingen faktor
+
+**Besluttet 2026-09-10.** Torv får ingen faktor i leveransen. Guarden nekter å gjette, og
+kostnaden ved nullen rapporteres i stedet, per sone og som spenn med metodefamilien navngitt.
+
+Alternativet ville vært å velge én verdi. Kartleggingen i
+`~/khepri-data/finland/TORV-VIRKNINGSGRAD.md` og `~/khepri-data/prior-art/RAPPORT-CHP-ALLOKERING.md`
+viser hvorfor det ikke lar seg gjøre uten å ta et standpunkt vi ikke har grunnlag for.
+
+**Fire metodefamilier er i bruk samtidig**, alle i produkter som leverer utslippsfaktorer i dag:
+
+| Familie | Hvem | Hva den fastsetter |
+|---|---|---|
+| Fixed-heat-efficiency | IEA, `IEA_Methodology_Emission_Factors.pdf` | η_varme = 0,90, el som residual |
+| 1/3 : 2/3 (DUKES) | DEFRA/BEIS, metodenotat 2026 §3.27–3.32 | fast forholdstall brensel el/varme |
+| Efficiency / hyödynjako | GHG Protocol `CHP_guidance_v1.0.pdf` (2006), SYKE/CO2DATA | fordeling etter hypotetisk separat produksjon |
+| Eksergi | ecoinvent, `support.ecoinvent.org/system-models` | fordeling etter arbeidspotensial |
+
+**GHG Protocols «efficiency method» og den finske hyödynjakomenetelmä er matematisk
+identiske** — samme formel, `E_H = E_T × (H/e_H) / (H/e_H + P/e_P)`, med ulike konstanter.
+Det er ikke to metoder, men én metode med to parametersett. Det gjør valget mellom dem til et
+valg av konstanter, ikke av prinsipp.
+
+**Spennet på samme brensel og samme år.** For torv i finsk statistikk (Tilastokeskus 13j5,
+2000–2024) gir metodevalget **459–1 922 g/kWh_e**, en faktor 4,2, uten at noen av verdiene er
+gale. De måler ulike ting. Tilastokeskus allokerer ikke selv; CHP-brenselet oppgis udelt.
+
+**Normverket løser det ikke.** EU 2015/2402 vedlegg I setter riktignok en harmonisert
+referanseverdi for torv — **39,0 % for separat elproduksjon**, 86 % for varmtvann i vedlegg II —
+men den er laget for å beregne primærenergibesparelse ved kraftvarme, ikke for å tilordne
+utslipp til en kWh. IPCC 2006 Vol. 2 unngår spørsmålet ved konstruksjon: CHP er en egen
+rapporteringskategori (1 A 1 a ii) der el og varme rapporteres samlet. EU ETS MRR 2018/2066
+regulerer anleggsnivå og nevner ikke kraftvarme. GHG Protocol Scope 2 delegerer, ordrett:
+«Reporting companies … should check with the CHP supplier».
+
+**Konsekvensen for oss.** Å sette én torvfaktor ville vært å velge én av fire familier og ett
+av flere parametersett, uten at CodeCarbons egen tabell gir grunnlag for valget — den har
+ingen torvnøkkel i det hele tatt. Det ville brutt samme regel som ADR-0009 hviler på: at
+leveransen regnes på CodeCarbons faktorbase, ikke på en blanding.
+
+Systemgrense C er derfor: **ingen faktor, guarden reiser seg, og nullens kostnad rapporteres.**
+`fossil_decisions` står åpen for den som vil ta stilling eksplisitt, med kilden skrevet ned.
+
+### Guarden reagerer på at kolonnen finnes, ikke på at det produseres i den
+
+`codecarbon_factors(occurring=df.columns)` ser kolonnenavn. En sone som rapporterer
+en `UNFACTORED_FOSSIL`-kolonne med null produksjon gjennom hele året utløser derfor
+`UnfactoredFossilError` like fullt som en sone der typen dekker to tredjedeler av
+miksen.
+
+Målt over 43 ENTSO-E-budsoner for 2025 reiste guarden seg i 21 soner. I 19 av dem
+produseres det faktisk i typen, fra `Fossil Brown coal/Lignite` på 64,65 % i RS ned
+til `Fossil Coal-derived gas` på 0,067 % i IT_NORD. I to — **ES** og **IT_SICI** —
+er kolonnene til stede med null produksjon hele 2025, og CI er uendret enten de
+settes til null eller til 995. ES bærer alle fire typene slik.
+
+Dette er konservativt og riktig: kallerens stillingtagen kreves før tallet finnes,
+og en kolonne som er null i år kan bære produksjon neste år uten at noen oppdager
+skiftet. Men **skillet bør være kjent for den som leser feilmeldingen.** «Kjent
+fossil type uten faktor» betyr «typen forekommer i uttrekket», ikke nødvendigvis
+«typen bidrar til miksen». Andelen må slås opp separat for å vite hvilket av de to
+tilfellene man står i.
+
 ### Hvorfor feile framfor å gjette
 
 Tre veier ble vurdert.
