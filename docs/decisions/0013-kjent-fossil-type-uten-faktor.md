@@ -66,6 +66,12 @@ kolonne har fortynningen ingen fysisk betydning.
 
 > **Superseded by ADR-0014, 2026-09-11: the source assigns peat to Other Fossil;
 > see FIN test.**
+>
+> **Note, 2026-09-11:** where this section or its sources say the peat share is falling, that is
+> an observation over 2021-2025, not an assumption about what comes next. A citizen initiative
+> to reclassify peat as renewable and remove it from emissions trading was submitted to the
+> Finnish Parliament on 17 June 2026 (KAA 1/2026 vp) and is pending. The direction ahead is
+> politically open, and the five-year series says nothing about it.
 
 **Besluttet 2026-09-10.** Torv får ingen faktor i leveransen. Guarden nekter å gjette, og
 kostnaden ved nullen rapporteres i stedet, per sone og som spenn med metodefamilien navngitt.
