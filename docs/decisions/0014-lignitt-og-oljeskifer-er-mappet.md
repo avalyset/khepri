@@ -213,6 +213,78 @@ guarden reagerer på kolonnen framfor på produksjonen. Taggen `v1.4` inneholder
 ikke «Systemgrense C» — seksjonen har aldri vært på `main` — så ingenting
 publisert bærer den superseder'te teksten.
 
+## Hva prinsippet ikke omfatter
+
+Prinsippet i denne ADR-en er: *les hvor kilden plasserer typen, og bruk nøkkelen den ruter
+til.* Det virker for de fire fossiltypene fordi kilden plasserer hver av dem entydig. Det
+virker **ikke** for `Waste`, og grunnen er verdt å skrive ned, fordi den ser ut som en
+unntaksregel og ikke er det.
+
+**Kilden priser en fraksjon ENTSO-E ikke skiller ut.**
+
+Embers metodedokument nevner avfall én gang, i fotnote 5, ukvalifisert: «Other Fossil
+generation includes generation from oil and petroleum products, as well as manufactured gases
+and waste». Lest alene peker den mot samme rute som torv og koksgass. Men den årlige
+EU/EØS-kjeden går ikke gjennom fotnoten — den går gjennom Eurostat. Ember, «Key Sources →
+Eurostat»:
+
+> «Annual European data up to the end of 2024 is taken from the European Commission's Eurostat
+> annual data for most European countries included in our data.»
+
+Og **Eurostat splitter avfallet i to koder** (SIEC-kodelisten,
+`ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/codelist/ESTAT/SIEC`):
+
+| Kode | Etikett | Havner i |
+|---|---|---|
+| `W6210` | Renewable municipal waste | **Bioenergy** (fornybart) |
+| `W6220` | Non-renewable municipal waste | **Fossil energy** |
+| `W6100` | Industrial waste (non-renewable) | Fossil energy |
+
+Målt for Norge 2023, Eurostat `nrg_bal_c`, brutto elproduksjon (GWh):
+
+| | GWh |
+|---|---:|
+| `W6210` Renewable municipal waste | **213,008** |
+| `W6220` Non-renewable municipal waste | **196,623** |
+| Sum avfall | 409,631 |
+| — derav ikke-fornybart | **48,0 %** |
+
+Splitten er uavhengig bekreftet av Statistisk sentralbyrå (tabell 11561, brenselinngang til
+kombinerte kraftvarmeverk 2023): fornybart avfall 1 275 GWh mot ikke-fornybart 1 177 GWh —
+**48,0 % ikke-fornybart**, samme tall fra en annen kant.
+
+At `W6210` faktisk følger den fornybare ruten helt fram er synlig i tallene: Eurostat fører
+Norges Bioenergy 2023 til 249,17 GWh, hvorav 213,008 er fornybart kommunalt avfall — og
+CodeCarbons `NOR.biofuel_TWh` er **0,24**.
+
+**Fraksjonen er ikke konstant.** Danmark 2023: `W6210` 711,777 mot `W6220` 982,93 — 58,0 %
+ikke-fornybart, mot Norges 48,0 %. Den varierer med land og med år.
+
+ENTSO-E A75 har **én** `Waste`-kolonne og skiller ikke. For NO1–NO5 i 2023 rapporterer den
+0,2784 TWh samlet, uten fordeling.
+
+**Derfor forblir `Waste` uklassifisert.** En riktig faktor ville vært en fraksjonsfaktor —
+andelen ikke-fornybart × `petroleum`, med andelen hentet per sone og per år fra en kilde
+ENTSO-E ikke leverer. Den ligger utenfor CodeCarbons tabell, som har én verdi per teknologi og
+ingen mekanisme for fraksjoner. `Waste` bæres derfor videre i nevneren på faktor 0 etter
+**ADR-0009**, sammen med `Other`, `Other renewable`, `Biomass` og `Marine`.
+
+Å mappe `Waste` til `petroleum` (816) ville tilordnet også den fornybare halvparten som
+fossil — det motsatte av hva kilden gjør. Det er ikke en strengere lesning av samme prinsipp;
+det er en feil anvendelse av det.
+
+**Dette er grunnen til at de ni publiserte verdiene er uendret — ikke et valg tatt for å holde
+dem uendret.** Rekkefølgen er verdt å være eksplisitt om: fraksjonsfunnet kom først, og
+konsekvensen for de ni fulgte av det. Hadde kilden ført alt avfall til Other Fossil uten
+splitt, ville samme prinsipp gitt `Waste` → `petroleum`, og NO1, NO2, NO3 og NO5 ville flyttet
+seg (26,0 → 29,4; 27,0 → 27,9; 25,8 → 26,5; 26,6 → 29,3). Det utfallet var på bordet og ble
+avvist av kilden, ikke av bekvemmelighet.
+
+**Sidebemerkning, ikke et argument.** Energinet priser den danske avfallsfraksjonen direkte:
+`DeclarationProduction` gir `Waste` 329,87 gCO2/kWh ved 125 %-allokering — godt under en ren
+fossilverdi, som er nettopp det en fraksjonsfaktor ser ut som når noen faktisk regner den. Det
+viser at fraksjonsfaktorer finnes; det gjør dem ikke tilgjengelige i CodeCarbons tabell.
+
 ## Konsekvenser
 
 - **Ingen publisert verdi flytter seg.** Ingen av NO1–NO5 eller SE1–SE4
