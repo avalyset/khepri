@@ -55,6 +55,27 @@ ENTSOE_TO_CODECARBON: Dict[str, tuple] = {
         "coal",
         "Direct. Does not occur in any Nordic zone-year in this dataset.",
     ),
+    "Fossil Brown coal/Lignite": (
+        "coal",
+        "codecarbon's table has one coal key, and the data behind it already "
+        "includes lignite: the factors come from OWID's `coal_electricity`, "
+        "which Ember builds by calculating hard coal and lignite separately "
+        "and summing them into one published coal value (Ember, Electricity "
+        "Data Methodology, 'Emissions from Electricity Generation - Coal'). "
+        "Lignite is therefore not a type the table lacks; it is a type this "
+        "mapping had not connected. See ADR-0014. Note the precision loss: "
+        "995 is a blended coal figure, and lignite is dirtier than hard coal, "
+        "so a lignite-heavy zone is understated by this key.",
+    ),
+    "Fossil Oil shale": (
+        "petroleum",
+        "Same table, same reasoning, different key. Ember files oil shale "
+        "under 'Other Fossil' (oil and petroleum products), and OWID's export "
+        "carries it in `oil_electricity`, not `coal_electricity` - Estonia, "
+        "which burns almost nothing but oil shale, reads coal_TWh 0.00 against "
+        "oil_TWh 3.56 in codecarbon's own `global_energy_mix.json`. The "
+        "codecarbon key fed by `oil` is `petroleum`. See ADR-0014.",
+    ),
     "Fossil Oil": (
         "petroleum",
         "Direct. Zero in every Nordic zone-year in this dataset.",
@@ -126,13 +147,19 @@ NO_CODECARBON_CATEGORY: Set[str] = {
 #: The Nordic case that exposes this is Finnish peat. See `docs/decisions/` and
 #: `~/khepri-data/rettelse/fi-femaar-resultat.txt` for the measured effect.
 #:
+#: ADR-0014 shortened this list. It first held four types, on the reading that
+#: codecarbon's table had no key for any of them. That reading was wrong for two:
+#: lignite is inside codecarbon's `coal` and oil shale inside its `petroleum`,
+#: through the OWID/Ember data the factors are built from. Both are now mapped
+#: above. What remains is the genuine residue - peat, which the source
+#: taxonomy does not mention at all, and coal-derived gas, which Ember files
+#: under "Other Fossil" with no per-technology key to map to.
+#:
 #: None of these occur in NO1-NO5 or SE1-SE4 in any year of the published
 #: extract, which is why the published figures are unaffected.
 UNFACTORED_FOSSIL: Set[str] = {
     "Fossil Peat",
-    "Fossil Brown coal/Lignite",
     "Fossil Coal-derived gas",
-    "Fossil Oil shale",
 }
 
 

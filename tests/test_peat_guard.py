@@ -91,10 +91,13 @@ def test_guard_raises_when_a_known_fossil_type_occurs_undecided():
 
 
 def test_guard_names_every_undecided_type_not_just_the_first():
+    # The pair is peat + coal-derived gas because ADR-0014 mapped oil shale,
+    # which used to stand here. The property under test is unchanged: every
+    # undecided type must be named, not just the one sorted first.
     with pytest.raises(UnfactoredFossilError) as exc:
-        codecarbon_factors(True, occurring=["Fossil Peat", "Fossil Oil shale"])
+        codecarbon_factors(True, occurring=["Fossil Peat", "Fossil Coal-derived gas"])
     msg = str(exc.value)
-    assert "Fossil Peat" in msg and "Fossil Oil shale" in msg
+    assert "Fossil Peat" in msg and "Fossil Coal-derived gas" in msg
 
 
 def test_guard_is_silent_once_the_caller_has_decided():
@@ -195,3 +198,63 @@ def test_the_guard_does_not_fire_for_any_published_zone(zone):
     df = _load(zone)
     codecarbon_factors(True, occurring=df.columns)          # must not raise
     assert set(df.columns) & set(NOT_GENERATION) == set()
+
+
+# --- 4. ADR-0014: the guard's list is shorter, and the line is where it belongs ---
+
+def test_lignite_and_oil_shale_are_mapped_not_guarded():
+    """ADR-0014. Both were in UNFACTORED_FOSSIL on the reading that codecarbon
+    had no key for them. It has: lignite sits inside `coal` and oil shale
+    inside `petroleum`, through the OWID/Ember data the table is built from."""
+    t = codecarbon_factors(carry_unfactored=True)
+    assert t["Fossil Brown coal/Lignite"] == 995
+    assert t["Fossil Oil shale"] == 816
+    assert "Fossil Brown coal/Lignite" not in UNFACTORED_FOSSIL
+    assert "Fossil Oil shale" not in UNFACTORED_FOSSIL
+
+
+def test_the_guard_still_holds_peat_and_coal_derived_gas():
+    """The residue is genuine: the source taxonomy does not name peat at all,
+    and files coal-derived gas under 'Other Fossil' with no key to map to."""
+    assert UNFACTORED_FOSSIL == {"Fossil Peat", "Fossil Coal-derived gas"}
+    t = codecarbon_factors(carry_unfactored=True)
+    assert "Fossil Peat" not in t
+    assert "Fossil Coal-derived gas" not in t
+
+
+def test_a_lignite_heavy_mix_passes_the_guard():
+    """A DE_LU-shaped mix: lignite, gas, wind, solar, biomass. Before ADR-0014
+    this raised; now the lignite is factored and the zone computes."""
+    occurring = ["Fossil Brown coal/Lignite", "Fossil Gas", "Wind Onshore",
+                 "Solar", "Biomass", "Waste"]
+    t = codecarbon_factors(True, occurring=occurring)      # must not raise
+    assert t["Fossil Brown coal/Lignite"] == 995
+    assert t["Biomass"] == 0.0                             # still carried at zero
+
+
+def test_peat_still_raises_in_the_same_mix():
+    """Same zone shape plus peat: the guard fires, and names only peat."""
+    occurring = ["Fossil Brown coal/Lignite", "Fossil Gas", "Wind Onshore",
+                 "Solar", "Biomass", "Waste", "Fossil Peat"]
+    with pytest.raises(UnfactoredFossilError) as exc:
+        codecarbon_factors(True, occurring=occurring)
+    msg = str(exc.value)
+    assert "Fossil Peat" in msg
+    assert "Fossil Brown coal/Lignite" not in msg
+
+
+def test_a_lignite_zone_computes_a_higher_ci_than_it_did_at_zero():
+    """The point of the mapping, on a synthetic BA-shaped mix: 61 % lignite
+    carried at zero reads clean; mapped to `coal` it does not."""
+    df = pd.DataFrame(
+        {"Fossil Brown coal/Lignite": [61.0], "Hydro Water Reservoir": [39.0]},
+        index=pd.to_datetime(["2025-01-01T00:00Z", "2025-01-01T01:00Z"])[:1],
+    )
+    mapped = compute(df, factors=codecarbon_factors(True, occurring=df.columns),
+                     excluded=set(), carry_unfactored_at_zero=True)
+    at_zero = compute(df, factors={"Hydro Water Reservoir": 26.0,
+                                   "Fossil Brown coal/Lignite": 0.0},
+                      excluded=set(), carry_unfactored_at_zero=True)
+    assert at_zero["ci"] == pytest.approx(10.14, abs=0.01)
+    assert mapped["ci"] == pytest.approx(617.09, abs=0.01)
+    assert mapped["ci"] > at_zero["ci"]
