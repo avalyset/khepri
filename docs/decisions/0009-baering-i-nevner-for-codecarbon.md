@@ -91,3 +91,28 @@ is not a caveat.
 **Changing ADR-0001 globally.** The excluding rule is correct for a published
 dataset whose users can read the coverage field, and changing it would move
 every figure in the manuscript for the benefit of one downstream consumer.
+
+
+## Tillegg 2026-09-11 — antakelsen denne beslutningen hviler på
+
+Beslutningen over sier at ubefaktorerte produksjonstyper blir stående i nevneren med
+faktor 0. Den sier ikke hva som må være sant for at det skal være forsvarlig.
+
+Antakelsen er at **en ubefaktorert type enten er lav-karbon eller genuint uklassifisert.**
+Holder den, er nullen en innrømmelse av uvitenhet: den fortynner CI-en litt, og
+fortynningen rapporteres gjennom dekningsfeltet. Holder den ikke — er typen kjent fossil —
+uttrykker nullen ikke uvitenhet, men påstår at produksjonen var ren.
+
+Antakelsen holder for hver type som forekommer i NO1–NO5 og SE1–SE4, og det er derfor
+denne ADR-en kunne skrives uten å nevne den. Den svikter for finsk torv.
+
+Se **ADR-0013**, som navngir kategorien, gjør bruddet til en feil framfor et stille tall,
+og redegjør for hvorfor dekningsfeltet alene ikke fanger forskjellen. Se videre
+**ADR-0014**, som fant at kilden bak CodeCarbons faktortabell faktisk plasserer alle fire
+typene ADR-0013 navnga, og mappet dem — hvorpå `UNFACTORED_FOSSIL` ble tom og guarden
+inert som standard. Mekanismen består; det var listen som var feil, ikke regelen.
+
+Bæring på null gjelder etter dette de typene som verken er kjent fossile eller mappet av
+kilden: `Waste`, `Biomass`, `Other`, `Other renewable` og `Marine`.
+
+Ingen verdi i denne ADR-en endres av tillegget. Ingen publisert figur flyttes.
