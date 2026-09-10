@@ -1,14 +1,9 @@
 """Sanity tests for the forecast layer (ADR-0004) — metrics + baselines, hand-computed."""
 
-import os
-import sys
-
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from khepri.forecast import mape, cindex, fc_flat, fc_diurnal, H  # noqa: E402
+from khepri.forecast import mape, cindex, fc_flat, fc_diurnal, H
 
 
 def test_mape_zero_on_perfect():
