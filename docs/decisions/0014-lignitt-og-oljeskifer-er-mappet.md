@@ -90,6 +90,18 @@ underestimeres av nøkkelen. Det er en kjent unøyaktighet i en mapping vi har
 valgt, ikke et hull i tabellen — og det er en annen slags feil enn den ADR-0013
 handler om.
 
+Det samme gjelder oljeskifer, og sterkere. IPCC 2006 Vol. 2 Ch. 2 Tab. 2.2 gir
+oljeskifer **107 000 kg CO2/TJ**, over hele kullspennet i samme tabell
+(94 600–101 000) og over torv (106 000). `petroleum` på 816 ligger dermed
+under både `coal` (995) og enhver kullkvalitet regnet per TJ. **816 er et gulv
+for EE, ikke et anslag.** Retningen på feilen er kjent og ensidig: sonen er
+underestimert, ikke overestimert.
+
+Begge caveats gjelder plasseringen av tallet, ikke plasseringen av typen.
+Kategoriseringen — lignitt hos `coal`, oljeskifer hos `petroleum` — følger av
+kilden. Hvor unøyaktig faktoren er innenfor den kategorien er et eget spørsmål,
+og det er ikke løst her.
+
 ## Hva dette ikke er
 
 **Mekanismen i ADR-0013 står.** En kjent fossil type uten faktor skal fortsatt

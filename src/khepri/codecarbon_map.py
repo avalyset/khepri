@@ -74,7 +74,11 @@ ENTSOE_TO_CODECARBON: Dict[str, tuple] = {
         "carries it in `oil_electricity`, not `coal_electricity` - Estonia, "
         "which burns almost nothing but oil shale, reads coal_TWh 0.00 against "
         "oil_TWh 3.56 in codecarbon's own `global_energy_mix.json`. The "
-        "codecarbon key fed by `oil` is `petroleum`. See ADR-0014.",
+        "codecarbon key fed by `oil` is `petroleum`. See ADR-0014. Note the "
+        "precision loss, which is larger here than for lignite: IPCC 2006 Vol. 2 "
+        "Ch. 2 Tab. 2.2 puts oil shale at 107 000 kg CO2/TJ, above the whole coal "
+        "range in that table (94 600-101 000) and above peat (106 000), so 816 is "
+        "a floor for an oil-shale zone, not an estimate.",
     ),
     "Fossil Oil": (
         "petroleum",
