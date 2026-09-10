@@ -80,6 +80,30 @@ ENTSOE_TO_CODECARBON: Dict[str, tuple] = {
         "range in that table (94 600-101 000) and above peat (106 000), so 816 is "
         "a floor for an oil-shale zone, not an estimate.",
     ),
+    "Fossil Peat": (
+        "petroleum",
+        "Ember files peat under 'Other Fossil', which OWID exports through "
+        "`oil_electricity` -> `oil_TWh`, and the codecarbon key fed by `oil` is "
+        "`petroleum`. Measured against StatFin 12vp for 2023, codecarbon's "
+        "Finnish `oil_TWh` of 2.35 is accounted for by oil 0.20 + peat 1.07 + "
+        "other fossil 1.01 = 2.28; without peat 1.14 TWh is unexplained. See "
+        "ADR-0014. Floor, not estimate: IPCC 2006 Vol. 2 Ch. 2 Tab. 2.2 puts "
+        "peat at 106 000 kg CO2/TJ, above every coal grade in that table, so "
+        "816 understates a peat-burning zone - and the CHP allocation question "
+        "(459-1 922 gCO2eq/kWh_e on the same Finnish statistics) is not settled "
+        "by this key, only bounded from below.",
+    ),
+    "Fossil Coal-derived gas": (
+        "petroleum",
+        "Same route as peat. Ember's footnote 5 puts 'manufactured gases' under "
+        "'Other Fossil'; Eurostat defines manufactured gases as gas works gas, "
+        "coke oven gas, blast furnace gas and other recovered gases, which is "
+        "what ENTSO-E's coal-derived gas is. OWID carries Other Fossil in "
+        "`oil_electricity`, so the key is `petroleum`. See ADR-0014. Floor, not "
+        "estimate: the feedstock is coal, and IPCC 2006 Vol. 2 Ch. 2 Tab. 2.2 "
+        "puts coal at 94 600-101 000 kg CO2/TJ, so 816 is below the fuel it "
+        "derives from.",
+    ),
     "Fossil Oil": (
         "petroleum",
         "Direct. Zero in every Nordic zone-year in this dataset.",
@@ -137,34 +161,27 @@ NO_CODECARBON_CATEGORY: Set[str] = {
 }
 
 
-#: ENTSO-E fossil production types that codecarbon has NO key for.
+#: ENTSO-E fossil production types with no codecarbon key. Empty since ADR-0014.
 #:
-#: This is the category ADR-0009's zero-carrying rule was never meant to cover.
-#: Carrying an unfactored type at zero is defensible when the type is either
-#: low-carbon (Biomass, Marine) or genuinely unclassified (Other, Other
-#: renewable, Waste): the zero is then an admission of ignorance that dilutes
-#: the CI slightly and is reported through the coverage field. It is NOT
-#: defensible for a type we know to be fossil. A known-fossil column carried at
-#: zero does not express ignorance — it asserts, silently and wrongly, that the
-#: generation was clean.
+#: ADR-0013 introduced this set with four members, on the reading that
+#: codecarbon's table had no key for any of them. That reading was wrong for all
+#: four, and ADR-0014 mapped them: lignite to `coal`, and oil shale, peat and
+#: coal-derived gas to `petroleum`, each through the OWID/Ember data the factor
+#: table is built from. The set is therefore empty, and the guard below is inert
+#: by default.
 #:
-#: The Nordic case that exposes this is Finnish peat. See `docs/decisions/` and
-#: `~/khepri-data/rettelse/fi-femaar-resultat.txt` for the measured effect.
+#: It is kept, and so is the guard, because the mechanism is the durable part.
+#: The rule ADR-0013 states - that a known-fossil column must not be carried
+#: silently at zero - held; what failed was the list of types it named. A future
+#: ENTSO-E type with no key belongs here, and callers who want to exercise the
+#: guard on a type this module has since mapped can pass `unfactored=` a set of
+#: their own.
 #:
-#: ADR-0014 shortened this list. It first held four types, on the reading that
-#: codecarbon's table had no key for any of them. That reading was wrong for two:
-#: lignite is inside codecarbon's `coal` and oil shale inside its `petroleum`,
-#: through the OWID/Ember data the factors are built from. Both are now mapped
-#: above. What remains is the genuine residue - peat, which the source
-#: taxonomy does not mention at all, and coal-derived gas, which Ember files
-#: under "Other Fossil" with no per-technology key to map to.
-#:
-#: None of these occur in NO1-NO5 or SE1-SE4 in any year of the published
-#: extract, which is why the published figures are unaffected.
-UNFACTORED_FOSSIL: Set[str] = {
-    "Fossil Peat",
-    "Fossil Coal-derived gas",
-}
+#: What replaced the guard for these four is the floor caveat stated with each
+#: mapping above: the key is a lower bound, and the direction of the error is
+#: written down. That is a weaker claim than a factor and a stronger one than a
+#: zero.
+UNFACTORED_FOSSIL: Set[str] = set()
 
 
 class UnfactoredFossilError(ValueError):
@@ -175,6 +192,7 @@ def codecarbon_factors(
     carry_unfactored: bool = True,
     occurring=None,
     fossil_decisions: Dict[str, float] = None,
+    unfactored: Set[str] = None,
 ) -> Dict[str, float]:
     """
     Build the ENTSO-E-keyed factor table for a codecarbon-basis run.
@@ -190,9 +208,14 @@ def codecarbon_factors(
             caller has not decided raises `UnfactoredFossilError`. Omit it only
             for a zone already known to be free of those types; the delivery
             path should always pass `df.columns`.
-        fossil_decisions: Explicit factor per `UNFACTORED_FOSSIL` type the
-            caller has taken a position on. The position must be stated here,
-            with its source, rather than falling out of a default.
+        fossil_decisions: Explicit factor per unfactored type the caller has
+            taken a position on. The position must be stated here, with its
+            source, rather than falling out of a default.
+        unfactored: The set of known-fossil types to guard, defaulting to
+            `UNFACTORED_FOSSIL`. That set is empty since ADR-0014, so the guard
+            is inert unless a caller names types explicitly. Pass a set here to
+            exercise the mechanism, or to guard a type this module has mapped
+            but the caller does not accept the mapping for.
 
     Returns:
         ENTSO-E production type -> gCO2eq/kWh, ready to pass as `factors=`.
@@ -210,16 +233,17 @@ def codecarbon_factors(
     if carry_unfactored:
         table.update({t: 0.0 for t in NO_CODECARBON_CATEGORY})
 
+    guarded = UNFACTORED_FOSSIL if unfactored is None else set(unfactored)
     decided = dict(fossil_decisions or {})
-    stray = sorted(set(decided) - UNFACTORED_FOSSIL)
+    stray = sorted(set(decided) - guarded)
     if stray:
         raise ValueError(
-            "fossil_decisions may only name UNFACTORED_FOSSIL types; got "
+            "fossil_decisions may only name guarded unfactored types; got "
             + ", ".join(stray)
         )
 
     if occurring is not None:
-        undecided = sorted((set(occurring) & UNFACTORED_FOSSIL) - set(decided))
+        undecided = sorted((set(occurring) & guarded) - set(decided))
         if undecided:
             raise UnfactoredFossilError(
                 "known-fossil production type(s) with no codecarbon factor and no "

@@ -64,6 +64,9 @@ kolonne har fortynningen ingen fysisk betydning.
 
 ### Systemgrense C: torv gis ingen faktor
 
+> **Superseded by ADR-0014, 2026-09-11: the source assigns peat to Other Fossil;
+> see FIN test.**
+
 **Besluttet 2026-09-10.** Torv får ingen faktor i leveransen. Guarden nekter å gjette, og
 kostnaden ved nullen rapporteres i stedet, per sone og som spenn med metodefamilien navngitt.
 
