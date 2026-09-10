@@ -1,13 +1,8 @@
 """Sanity tests for the CI calculation — verified against hand-computed numbers."""
 
-import os
-import sys
-
 import pandas as pd
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from khepri.ci import ci_of_mix, compute  # noqa: E402
+from khepri.ci import ci_of_mix, compute
 
 
 def test_known_mix_hand_computed():
