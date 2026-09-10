@@ -62,6 +62,26 @@ typen ikke kan nå den på noen basis. Det er strengere enn å bære den på nul
 og med vilje: en null-båret kolonne fortynner stille, og for en ikke-produksjons-
 kolonne har fortynningen ingen fysisk betydning.
 
+### Guarden reagerer på at kolonnen finnes, ikke på at det produseres i den
+
+`codecarbon_factors(occurring=df.columns)` ser kolonnenavn. En sone som rapporterer
+en `UNFACTORED_FOSSIL`-kolonne med null produksjon gjennom hele året utløser derfor
+`UnfactoredFossilError` like fullt som en sone der typen dekker to tredjedeler av
+miksen.
+
+Målt over 43 ENTSO-E-budsoner for 2025 reiste guarden seg i 21 soner. I 19 av dem
+produseres det faktisk i typen, fra `Fossil Brown coal/Lignite` på 64,65 % i RS ned
+til `Fossil Coal-derived gas` på 0,067 % i IT_NORD. I to — **ES** og **IT_SICI** —
+er kolonnene til stede med null produksjon hele 2025, og CI er uendret enten de
+settes til null eller til 995. ES bærer alle fire typene slik.
+
+Dette er konservativt og riktig: kallerens stillingtagen kreves før tallet finnes,
+og en kolonne som er null i år kan bære produksjon neste år uten at noen oppdager
+skiftet. Men **skillet bør være kjent for den som leser feilmeldingen.** «Kjent
+fossil type uten faktor» betyr «typen forekommer i uttrekket», ikke nødvendigvis
+«typen bidrar til miksen». Andelen må slås opp separat for å vite hvilket av de to
+tilfellene man står i.
+
 ### Hvorfor feile framfor å gjette
 
 Tre veier ble vurdert.
