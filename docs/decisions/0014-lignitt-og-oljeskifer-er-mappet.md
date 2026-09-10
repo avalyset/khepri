@@ -260,6 +260,16 @@ CodeCarbons `NOR.biofuel_TWh` er **0,24**.
 **Fraksjonen er ikke konstant.** Danmark 2023: `W6210` 711,777 mot `W6220` 982,93 — 58,0 %
 ikke-fornybart, mot Norges 48,0 %. Den varierer med land og med år.
 
+**Hva som ikke stemmer, og hvorfor det ikke velter dette.** CodeCarbons `NOR.oil_TWh` er 0,82,
+mens Eurostats ikke-kull-ikke-gass-fossile rest for Norge 2023 summerer til 0,332 TWh
+(olje 13,405 + `W6220` 196,623 + manufactured gases 121,939 GWh). Avviket er ikke forklart
+her. Det speiler samme aldringsproblem som er dokumentert for Tyskland — CodeCarbons snapshot
+er tatt fra en eldre OWID-revisjon enn den som ligger ute nå — men det er en hypotese, ikke
+et funn. **Argumentet over hviler ikke på det tallet.** Det hviler på at kilden *splitter*
+avfallet i to koder som går hver sin vei, og at `W6210` beviselig følger den fornybare ruten
+(Bioenergy 249,17 GWh mot `biofuel_TWh` 0,24). Splitten er det som gjør en enkelt
+`Waste`-faktor uleselig ut av tabellen, uansett hvilken fossilkolonne `W6220` ender i.
+
 ENTSO-E A75 har **én** `Waste`-kolonne og skiller ikke. For NO1–NO5 i 2023 rapporterer den
 0,2784 TWh samlet, uten fordeling.
 
