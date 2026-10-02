@@ -20,9 +20,9 @@ authors:
     orcid: "https://orcid.org/0009-0001-9188-6788"
 repository-code: "https://github.com/avalyset/khepri"
 license: [Apache-2.0, CC-BY-4.0]
-version: "1.4.0"
-date-released: "2026-09-09"
-doi: 10.5281/zenodo.21042581
+version: "1.5.0"
+date-released: "2026-10-02"
+doi: 10.5281/zenodo.23101127
 identifiers:
   - type: doi
     value: 10.5281/zenodo.21042581
@@ -39,6 +39,12 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.22285397
     description: Version 1.3.0 (codecarbon delivery basis documented)
+  - type: doi
+    value: 10.5281/zenodo.22684380
+    description: Version 1.4.0 (per-zone values reported in the EDS submission)
+  - type: doi
+    value: 10.5281/zenodo.23101127
+    description: Version 1.5.0 (corrected forecast and drift documents; CI values unchanged)
   - type: other
     value: "arXiv:2608.29717"
     description: Preprint describing the method

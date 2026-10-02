@@ -14,8 +14,28 @@ track a step change in its fossil-gas share (near zero in 2021, 6.23% in 2024,
 3.63% in 2025), not a smooth trend. A model should NOT be able to predict these
 steps from CI history alone. High NO4 skill across the step boundaries =>
 suspect leakage, not skill.
+
+VERSION 1.5 CORRECTIONS (2026-10-01; ADR-0004 and ADR-0008 addenda). Three
+departures from the registered design were found at journal revision and are
+corrected here. The published 1.4 runs are reported next to the corrected ones in
+docs/forecast-results.md and docs/se-forecast-results.md.
+  (i)   History: eval_split loaded only the training years plus the test year, so in
+        the Swedish split 2024 was absent and the gap was filled forward with the last
+        value. It now loads every year from the first training year through the test
+        year (`history_years`).
+  (ii)  GBM training origins: the window was anchored at test_start - 400 days and cut
+        at train_end, which left 34 origins (28 Nov-31 Dec 2023) instead of 365, and let
+        targets of the last origins reach past train_end. It is now the last 365 daily
+        origins whose 96-h targets all lie at or before train_end
+        (`gbm_train_origins`).
+  (iii) SARIMA fallback: a failed apply()/forecast() was replaced by diurnal
+        persistence without a trace. The substitution is kept, but it is now logged,
+        flagged per row (`fallback`) and counted in the return value.
+The hour-of-day features (sin/cos of the origin hour) were removed: the origin is
+always 00:00, so they were constant and received no splits.
 """
 
+import logging
 import os
 import warnings
 import numpy as np
@@ -24,6 +44,7 @@ import pandas as pd
 from .ci import load_zone, ci_series, RAW_DIR
 
 warnings.simplefilter("ignore")
+log = logging.getLogger(__name__)
 OUT_DIR = os.environ.get("KHEPRI_FC_OUT", os.path.expanduser("~/khepri-data/forecast"))
 H = 96  # horizon (hours)
 
@@ -92,10 +113,9 @@ def build_gbm(hist, train_origins):
 
 
 def _features(hist, origin):
-    # origin timestamp + recent CI lags (24h)
-    h = origin.hour
-    feats = [np.sin(2 * np.pi * h / 24), np.cos(2 * np.pi * h / 24),
-             origin.dayofweek, origin.month, float(hist.loc[origin])]
+    # origin calendar + recent CI lags (24h). The origin is always 00:00, so no
+    # hour-of-day feature: it would be constant (removed in 1.5, see module docstring).
+    feats = [origin.dayofweek, origin.month, float(hist.loc[origin])]
     lags = hist.loc[origin - pd.Timedelta(hours=24): origin].values[-24:]
     feats += list(lags) if len(lags) == 24 else [float(hist.loc[origin])] * 24
     return feats
@@ -135,8 +155,27 @@ def actual_window(hist, origin):
     return hist.reindex(idx).values
 
 
+def history_years(train_years, test_end):
+    """Every year from the first training year through the test year (1.5 correction (i))."""
+    return list(range(min(train_years), test_end.year + 1))
+
+
+def gbm_train_origins(hist, train_end, n=365):
+    """The last `n` daily 00:00 origins whose H-hour targets all lie at or before
+    `train_end` (1.5 correction (ii)): the last origin is the day of train_end - H."""
+    last = (train_end - pd.Timedelta(hours=H)).normalize()
+    cand = pd.date_range(last - pd.Timedelta(days=n - 1), last, freq="1D", tz="UTC")
+    return [o for o in cand if o in hist.index][-n:]
+
+
 def eval_split(zone, train_years, train_end, test_start, test_end, models_on=True):
-    res = hourly_ci(zone, sorted(set(train_years + [test_start.year, test_end.year])))
+    """Evaluate all models on one zone split.
+
+    Returns (rows, n_origins, gap_fraction, sarima_fitted, gbm_trained, n_sarima_fallback).
+    The sixth element is new in 1.5: the number of origins where SARIMA apply()/forecast()
+    failed and diurnal persistence was substituted; those SARIMA rows carry fallback=True.
+    """
+    res = hourly_ci(zone, history_years(train_years, test_end))
     if res is None:
         return None
     hist, gap = res
@@ -153,26 +192,32 @@ def eval_split(zone, train_years, train_end, test_start, test_end, models_on=Tru
                          ).fit(disp=False, maxiter=50)
     except Exception as e:
         fitted = None
+        log.warning("%s: SARIMA fit failed, no SARIMA rows: %r", zone, e)
     gbm = None
     if models_on:
-        train_origins = [o for o in pd.date_range(test_start - pd.Timedelta(days=400),
-                         train_end, freq="1D", tz="UTC") if o in hist.index]
-        gbm = build_gbm(hist, train_origins[-365:]) if train_origins else None
+        train_origins = gbm_train_origins(hist, train_end)
+        gbm = build_gbm(hist, train_origins) if train_origins else None
 
     # SARIMA per origin on a bounded 45-day window (memory-safe, captures daily seasonality)
     WIN = pd.Timedelta(days=45)
     rows = []
+    n_fallback = 0
     for o in origins:
         actual = actual_window(hist, o)
         if np.isnan(actual).any():
             continue
         preds = {"flat": fc_flat(hist, o), "diurnal": fc_diurnal(hist, o)}
+        fell_back = False
         if fitted is not None:
             try:
                 w = hist.loc[o - WIN: o]
                 preds["SARIMA"] = np.asarray(fitted.apply(w).forecast(H))
-            except Exception:
+            except Exception as e:
                 preds["SARIMA"] = fc_diurnal(hist, o)
+                fell_back = True
+                n_fallback += 1
+                log.warning("%s %s: SARIMA apply/forecast failed, diurnal persistence "
+                            "substituted (counted, row flagged): %r", zone, o, e)
         if gbm is not None:
             preds["GBM"] = fc_gbm(gbm, hist, o)
         for model, f in preds.items():
@@ -181,6 +226,7 @@ def eval_split(zone, train_years, train_end, test_start, test_end, models_on=Tru
                 a, p = actual[sl], np.asarray(f)[sl]
                 rows.append({"zone": zone, "model": model, "day": day + 1,
                              "mape": mape(a, p), "mae": np.mean(np.abs(a - p)),
-                             "rmse": np.sqrt(np.mean((a - p) ** 2)), "cidx": cindex(a, p)})
+                             "rmse": np.sqrt(np.mean((a - p) ** 2)), "cidx": cindex(a, p),
+                             "fallback": bool(model == "SARIMA" and fell_back)})
     df = pd.DataFrame(rows)
-    return df, len(origins), gap, (fitted is not None), (gbm is not None)
+    return df, len(origins), gap, (fitted is not None), (gbm is not None), n_fallback

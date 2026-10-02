@@ -9,6 +9,41 @@ Method: `drift.py` (ADR-0003) over `ci.py` (ADR-0001+0002, IPCC AR5, duration-we
 Values are computed from the ENTSO-E extract; the raw data is not committed (see
 `.gitignore`) but is fetched reproducibly via the API.
 
+## Correction 2026-10-01 (version 1.5)
+
+The mix arm is recomputed by the rule (journal revision EDS-2026-0107; source:
+`~/khepri-data/eds-revisjon/07-tabell3-korreksjon.md`) in both registered readings: first year against last (ADR-0007 §2,
+the reading of the tables below) and year over year (ADR-0003 §2, which ADR-0007 §2 also asks to report). The text below the
+block is the version 1.4 text, kept unchanged for the record.
+
+The rule (ADR-0003 §2, verbatim): «Year-over-year CI change > 15% OR mix-share shift > 5 percentage points for a
+material type (material per ADR-0002: ≥ 0.5% mix or ≥ 5 MW) counts as material drift.» Operationalised here: share =
+`mix_pct` (energy-weighted share of all generation in clean intervals, the basis of this document); a type counts in a pair of
+years if it is material as `ci.py` implements ADR-0002 (≥ 0.5% **and** ≥ 5 MW; see the ADR-0003 addendum on the "or") in
+either year. Types without a verified factor (Other, Other renewable, Waste) are excluded before classification and do not
+count. Nothing in the CI figures changes.
+
+| Zone | Largest YoY CI change | CI arm, YoY | Mix arm, YoY: material types > 5 pp | CI change 2022→2025 | CI arm, window | Mix arm, window: material types > 5 pp |
+|---|---|:-:|---|---|:-:|---|
+| SE1 | -4.69% (2023→2024) | not exceeded | 2023→2024: Hydro Water Reservoir -7.48; Wind Onshore +7.58 | -3.83% | not exceeded | Hydro Water Reservoir -6.19; Wind Onshore +6.40 |
+| SE2 | -2.22% (2023→2024) | not exceeded | none | -2.36% | not exceeded | none |
+| SE3 | +6.40% (2022→2023) | not exceeded | 2022→2023: Hydro Water Reservoir +6.00; Nuclear -5.49 | +7.82% | not exceeded | Nuclear -6.37 |
+| SE4 | +7.22% (2022→2023) | not exceeded | 2022→2023: Hydro Water Reservoir +5.17 *(hydro categories only)* | +15.21% | exceeded | Solar +6.33 |
+
+**What this changes in the sections below.**
+- *SE4, window*: `Other` (−6.1 pp) is excluded from the CI for lack of a verified factor and is not a material type in
+  ADR-0002's sense, so under the rule the window mix arm is crossed by Solar alone (+6.33 pp). The verdict "drifting" stands
+  (CI +15.2118%, Solar +6.33 pp).
+- *Year over year*: no Swedish zone crosses the CI arm (SE4's largest step is +7.22%). SE1 crosses the mix arm in 2023→2024
+  (reservoir and wind), SE3 in 2022→2023 (reservoir and nuclear), and SE4 in 2022→2023 through reservoir (+5.17 pp) rather than
+  solar, whose largest annual step is +2.42 pp. SE2 crosses neither arm in either reading.
+- The two readings agree on SE2 and differ on how SE4's monotone rise is described: as a cumulative 15.2% over three years, or
+  as three steps below the annual threshold.
+
+---
+
+*Version 1.4 text follows, unchanged.*
+
 ## Annual CI per zone (gCO2eq/kWh)
 
 | Zone | 2022 | 2023 | 2024 | 2025 | 4-yr mean |

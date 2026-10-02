@@ -4,6 +4,59 @@ Production-based CI per zone per year, ADR-0001+0002 pipeline. Threshold
 (pre-registered in ADR-0003): year-over-year CI change > 15% OR mix shift > 5 pp
 = material drift.
 
+## Correction 2026-10-01 (version 1.5)
+
+The mix arm of the drift rule was not applied as registered. The verdict further down rests on the CI arm: it calls
+NO1–NO3 stable without applying the mix arm, and it attributes the NO4 and NO5 drift to gas. Recomputed by the rule (journal revision
+EDS-2026-0107; source: `~/khepri-data/eds-revisjon/07-tabell3-korreksjon.md`), both readings are given: year over year
+(ADR-0003) and first year against last (the window used in the paper's Table 3). The text below the block is the
+version 1.4 text, kept unchanged for the record.
+
+The rule (ADR-0003 §2, verbatim): «Year-over-year CI change > 15% OR mix-share shift > 5 percentage points for a
+material type (material per ADR-0002: ≥ 0.5% mix or ≥ 5 MW) counts as material drift.» Operationalised here: share =
+`mix_pct` (energy-weighted share of all generation in clean intervals, the basis of this document); a type counts in a pair of
+years if it is material as `ci.py` implements ADR-0002 (≥ 0.5% **and** ≥ 5 MW; see the ADR-0003 addendum on the "or") in
+either year. Types without a verified factor (Other, Other renewable, Waste) are excluded before classification and do not
+count. Nothing in the CI figures changes.
+
+| Zone | Largest YoY CI change | CI arm, YoY | Mix arm, YoY: material types > 5 pp | CI change 2021→2025 | CI arm, window | Mix arm, window: material types > 5 pp |
+|---|---|:-:|---|---|:-:|---|
+| NO1 | -1.33% (2021→2022) | not exceeded | 2021→2022: Hydro Run-of-river and poundage +34.67; Hydro Water Reservoir -37.20 *(hydro categories only)* | -1.34% | not exceeded | Hydro Run-of-river and poundage +33.00; Hydro Water Reservoir -36.47 *(hydro categories only)* |
+| NO2 | +4.20% (2022→2023) | not exceeded | 2021→2022: Hydro Pumped Storage -5.79; Hydro Run-of-river and poundage +5.45 *(hydro categories only)* | +3.27% | not exceeded | none |
+| NO3 | +3.42% (2024→2025) | not exceeded | 2021→2022: Hydro Run-of-river and poundage +8.86; Hydro Water Reservoir -11.79; Wind Onshore +5.30 · 2024→2025: Hydro Water Reservoir +7.42; Wind Onshore -5.40 | -0.87% | not exceeded | Hydro Run-of-river and poundage +9.60; Hydro Water Reservoir -8.89 *(hydro categories only)* |
+| NO4 | +61.38% (2021→2022) | exceeded | 2021→2022: Hydro Water Reservoir -7.66 *(hydro categories only)* · 2023→2024: Hydro Water Reservoir -7.71 *(hydro categories only)* · 2024→2025: Hydro Water Reservoir +6.45 *(hydro categories only)* | +69.84% | exceeded | Hydro Water Reservoir -12.67 *(hydro categories only)* |
+| NO5 | -17.61% (2021→2022) | exceeded | 2021→2022: Hydro Run-of-river and poundage +5.40 *(hydro categories only)* | -29.92% | exceeded | Hydro Run-of-river and poundage +5.22 *(hydro categories only)* |
+
+**What this changes in the sections below.**
+- *Verdict, NO1–NO3 "H0 holds"*: true on the CI arm (every year-over-year change within ±5%). All three cross the mix arm,
+  through shifts between Hydro Water Reservoir and Hydro Run-of-river and poundage (and, in NO2, Pumped Storage), which carry
+  the same factor (24) and leave CI unchanged; NO3 also crosses through Wind Onshore year over year (+5.30 in 2021→2022,
+  −5.40 in 2024→2025).
+- *NO4 and NO5*: the CI arm is crossed as stated. The mix arm is crossed by hydro categories, not by gas: the largest
+  year-over-year change in the fossil-gas share is +3.07 pp in NO4 (2021→2022) and -1.31 pp in NO5 (2021→2022). The
+  CI arm is what identifies gas.
+- *Regime test 2021–2022 against 2023–2025*: unchanged (+0.2 / −3.5 / +1.3 / −32.8 / +28.4%).
+
+**Observation, unconfirmed.** In all five Norwegian zones the shift between reservoir and run-of-river happens in the same hour,
+27 October 2021 10:00–11:00 UTC; in each zone it is the largest hourly change in run-of-river output of the year (rank 1 of
+8 759), and total hydro output is nearly unchanged:
+
+| Zone | Hydro Water Reservoir (MW) | Run-of-river and poundage (MW) | Pumped storage (MW) | Total hydro |
+|---|---|---|---|---|
+| NO1 | 1742.5 → 810.2 | 555.1 → 1473.8 | – | 2297.6 → 2284.1 (-0.6%) |
+| NO2 | 3501.1 → 3316.9 | 403.9 → 703.2 | 217.9 → 0.2 | 4122.9 → 4020.3 (-2.5%) |
+| NO3 | 2124.0 → 1675.1 | 393.2 → 859.2 | 0.0 → 0.0 | 2517.2 → 2534.4 (+0.7%) |
+| NO4 | 2316.4 → 2014.2 | 67.5 → 297.4 | – | 2384.0 → 2311.6 (-3.0%) |
+| NO5 | 2769.3 → 2616.5 | 140.1 → 496.8 | 273.8 → 34.3 | 3183.2 → 3147.6 (-1.1%) |
+
+This is consistent with units being reclassified between ENTSO-E production types in the reporting chain rather than with a
+change in generation. It has **not** been confirmed with Statnett or ENTSO-E. The phrase "an ENTSO-E reclassification" in the
+NO5 section below refers to this observation and should be read as unconfirmed.
+
+---
+
+*Version 1.4 text follows, unchanged.*
+
 ## Annual CI per zone (gCO2eq/kWh)
 
 | Zone | 2021 | 2022 | 2023 | 2024 | 2025 | Verdict |

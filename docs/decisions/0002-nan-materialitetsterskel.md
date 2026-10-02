@@ -58,3 +58,26 @@ and small types.
   of freedom to fish with; rejected. The threshold is pre-registered.
 - **Drop NaN exclusion entirely (NaN=0)** — rejected in ADR-0001 (artificial for
   material types).
+
+---
+
+## Addendum 2026-10-01 — what the NaN in a material type is, and what the rule costs
+
+Found while preparing the journal revision (EDS-2026-0107); the rule above is **unchanged for every 1.x version**.
+
+1. **The NaN that costs coverage in 2025 is pumping, not missing data.** The intervals lost in NO2, NO3 and NO5 in 2025
+   (coverage 87.7%, 93.8% and 93.6%) are not caused by the minor types this ADR was written for but by
+   *Hydro Pumped Storage*, a material type whose generation column is NaN in the intervals where its consumption column
+   is positive, that is, while the plant is pumping: 3 445 of 3 445 NaN intervals in NO2, 1 704 of 1 717 in NO3 and
+   1 790 of 1 795 in NO5. ENTSO-E reports a pumping plant's output as absent rather than as zero, and the rule reads that
+   absence as missing data.
+2. **The cost, measured.** Recomputing every zone-year 2021–2025 with all NaN set to zero moves the annual CI by at most
+   −0.12 gCO2eq/kWh (NO2 2025, −0.116); with no materiality threshold by at most −0.60 (NO2 2025); with linear
+   interpolation of gaps up to 3 h by at most −0.002. Source: `~/khepri-data/eds-revisjon/04-nan-sensitivitet.md` (D3).
+3. **The rationale's bound was too strong.** "A fraction of a gCO2eq/kWh regardless of its factor" holds for low-factor
+   types only. Setting a type with energy share s and factor f to zero moves the energy-weighted average by
+   s(CI − f)/(1 − s), so at the 0.5% threshold the effect is bounded by 0.005·f/0.995: 0.12 for a hydro type, 2.5 for gas
+   and 4.1 for coal, and slightly less in practice since the effect scales with f − CI.
+
+Reading pumping hours as zero generation is proposed for method version 2.x in
+[ADR-0017](0017-pumpetimer-som-null-generering.md). It is not applied in 1.x, so the published 1.x series are unchanged.

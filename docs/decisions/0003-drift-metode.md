@@ -57,3 +57,23 @@ Pre-registration is locked before the drift result is observed.
 - Hypothesis test with p-value on regime: rejected — we have the full population
   (all intervals), not a sample; effect size against threshold is more appropriate
   than significance.
+
+---
+
+## Addendum 2026-10-01 — the materiality "or", and the mix arm as applied
+
+Found while preparing the journal revision (EDS-2026-0107). The decisions above are unchanged.
+
+1. **"or" in Decision 2 should read "and".** The parenthesis "material per ADR-0002: ≥ 0.5% mix or ≥ 5 MW" inverts
+   ADR-0002, which defines a type as *negligible* if it is below 0.5% **or** below 5 MW, so a *material* type is at or above
+   0.5% **and** at or above 5 MW. That is what `ci.py` implements (`share_pct >= MATERIAL_MIN_SHARE_PCT and
+   type_mean >= MATERIAL_MIN_MW`) and what every published figure uses. ADR-0002 and the code govern.
+2. **The mix arm in the published documents departed from the rule.** `docs/drift-results-2021-2025.md` called NO1–NO3
+   stable on the CI arm alone and attributed the NO4/NO5 mix shift to gas; the paper's Table 3 (EDS submission) judged the
+   mix arm on the gas share. Applied as registered — any material type, more than 5 pp, year over year — the mix arm is
+   crossed in every zone except SE2, and in all five Norwegian zones by shifts between hydro categories (same factor, CI
+   unchanged), not by gas. The recomputation is in the dated correction blocks of both drift documents, in both readings
+   (year over year, and first year against last as ADR-0007 registers). No CI figure changes.
+3. **Regime window.** Decision 3 says 2023-2026; `drift.regime_compare` and the drift document use 2023–2025. The
+   published comparison is 2023–2025; with H1 2026 added the differences move by at most 1.1 percentage points and no
+   zone changes side of the 15% threshold (`~/khepri-data/eds-revisjon/07-tabell3-korreksjon.md`).
