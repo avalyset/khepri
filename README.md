@@ -72,4 +72,4 @@ The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `fo
 
 ## Status
 
-Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). The per-zone values were taken upstream into codecarbon: the maintainer folded the Swedish values into #1260 and merged it on 9 September 2026, #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The consumption-based layer is not implemented. The current release is version 1.5.0 (prepared; not yet archived); the concept DOI resolves to the latest archived version.
+Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). The per-zone values were taken upstream into codecarbon: the maintainer folded the Swedish values into #1260 and merged it on 9 September 2026, #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The consumption-based layer is not implemented. The current release is version 1.5.0 (archived at 10.5281/zenodo.XXXXXXXX); the concept DOI resolves to the latest archived version.

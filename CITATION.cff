@@ -21,8 +21,8 @@ authors:
 repository-code: "https://github.com/avalyset/khepri"
 license: [Apache-2.0, CC-BY-4.0]
 version: "1.5.0"
-date-released: "2026-09-09"
-doi: 10.5281/zenodo.21042581
+date-released: "2026-10-02"
+doi: 10.5281/zenodo.XXXXXXXX
 identifiers:
   - type: doi
     value: 10.5281/zenodo.21042581
@@ -42,6 +42,9 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.22684380
     description: Version 1.4.0 (per-zone values reported in the EDS submission)
+  - type: doi
+    value: 10.5281/zenodo.XXXXXXXX
+    description: Version 1.5.0 (corrected forecast and drift documents; CI values unchanged)
   - type: other
     value: "arXiv:2608.29717"
     description: Preprint describing the method
