@@ -117,3 +117,32 @@ derived from it. The decision recorded above rests on the *measured* gas share �
 near zero in 2021, 6.23% in 2024, 3.63% in 2025 — which is unaffected, and the
 reasoning is therefore left as written. The plant attribution is no longer used
 in outward-facing material (README, method notes, upstream pull requests).
+
+---
+
+## Addendum 2026-10-01 — two implementation deviations, corrected in version 1.5
+
+Found while preparing the journal revision (EDS-2026-0107). The decisions above are unchanged; the implementation did not
+follow them in two respects, and the code is corrected in `src/khepri/forecast.py` (version 1.5).
+
+1. **The GBM was trained on 34 daily origins, not on a year of them.** `eval_split` built the training origins from a window
+   anchored at `test_start − 400 days` and cut at `train_end`, then took the last 365. For the primary split that left 34
+   origins (28 November–31 December 2023), and the 96-h targets of the last four reached past `train_end` (148 targets, in
+   2024 data that no model was supposed to see). In the secondary split the window did hold 365 origins, but the targets of
+   the last four — 148 hours, 1–4 July 2021 — fell inside the test period H2 2021. Corrected: the last 365 daily origins
+   whose 96-h targets all lie at or before `train_end` (`gbm_train_origins`).
+2. **The SARIMA fallback was silent.** A failed `apply()`/`forecast()` was replaced by diurnal persistence without a
+   trace. A census of the version 1.4 runs found no fallback at any origin in any of the 14 zone-splits, so no published
+   figure is affected. From 1.5 the substitution is logged, flagged per row and counted in the return value.
+
+The constant hour-of-day features were removed at the same time (the origin is always 00:00, so they received no
+splits). The corrected code reproduces the corrected runs exactly (SE1 checked, every row identical).
+
+**Outcome on the corrected runs** (primary split, mean MAPE over days 1–4): the GBM is lower than SARIMA in NO1, NO2 and
+NO3 (by 0.16–0.54 percentage points) and higher in NO4 (+2.92) and NO5 (+0.53). NO4's GBM figure is 10.16, not the 35.65
+reported in version 1.4. Secondary split: the corrected GBM differs from the published one by at most 0.18 percentage
+points.
+
+**A gap in the pre-registration, recorded rather than filled.** Decision 6 says "does not meaningfully beat" but no
+numerical threshold for "meaningfully" was registered. None is set after the fact; the result is reported as direction and
+size per zone. Corrected tables: `docs/forecast-results.md` (correction block).

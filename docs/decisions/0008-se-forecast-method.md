@@ -44,3 +44,26 @@ The effective training window is short: 2 years (2022-2023) for training. For a 
 - Field-exact secondary split as for NO: rejected — no per-zone reference to match (CarbonCast is aggregate), and the data window lacks pre-2022. Does not give what it gave for NO.
 - Using CarbonCast's own paper SE figures as comparison: rejected — unverified (PDF inaccessible). Only the EnsembleCI Table 2 figure is used.
 - Starting with heavy ML: rejected — ADR-0004 inheritance escalates low→high; H0 is tested with the baseline first.
+
+---
+
+## Addendum 2026-10-01 — two implementation deviations, corrected in version 1.5
+
+Found while preparing the journal revision (EDS-2026-0107). Decisions 1–4 are unchanged; the code is corrected in
+`src/khepri/forecast.py` (version 1.5).
+
+1. **2024 was not loaded as history.** Decision 2 holds 2024 as validation; the implementation loaded only the training
+   years and the test year (2022, 2023, 2025), so the 2024 gap was filled forward with the last value and the first
+   45 origins of 2025 saw a constant in their 45-day SARIMA window and in the GBM lags. Corrected: every year from the
+   first training year through the test year is loaded. SARIMA day-1 MAPE moves from 7.85 / 6.75 / 3.38 / 16.06 to
+   7.81 / 6.69 / 3.37 / 16.07 (SE1–SE4).
+2. **The GBM was trained on 34 daily origins**, as in the Norwegian primary split (ADR-0004 addendum), with the targets of
+   the last four in the forward-filled 2024 stretch. Corrected the same way.
+
+**Outcome on the corrected runs** (mean MAPE over days 1–4): the GBM is lower than SARIMA in all four zones, by 0.88 (SE1),
+0.85 (SE2), 0.02 (SE3) and 2.64 (SE4) percentage points. The version 1.4 statement "SARIMA beats GBM in all four zones" was
+the 34-origin training.
+
+**The inherited threshold does not exist.** Decision 4 inherits the materiality threshold for "meaningful improvement"
+from ADR-0004, but ADR-0004 registered none (see its addendum). The outcome is reported as direction and size per zone.
+Corrected tables: `docs/se-forecast-results.md` (correction block).
