@@ -6,6 +6,89 @@ Method: forecast.py unchanged — SARIMA + persistence floor + GBM
 Split: train 2022-2023, test 2025 (validation 2024 held internal)
 Zones: SE1, SE2, SE3, SE4 | Horizon: 96h day-wise
 
+## Correction 2026-10-01 (version 1.5)
+
+Two departures from ADR-0008 (which inherits ADR-0004's method) in the runs reported further down
+were found while preparing the journal revision (Environmental Data Science, EDS-2026-0107). The code
+is corrected in `src/khepri/forecast.py` (version 1.5; dated addendum in ADR-0008). The tables in this
+block are the corrected runs, with the version 1.4 GBM figures beside them. The text below the block is
+the version 1.4 text, kept unchanged for the record.
+
+1. **2024 was not loaded as history.** `eval_split` loaded the training years and the test year only
+   (2022, 2023, 2025). The 2024 gap was filled forward with the last value, so the first 45 origins of
+   2025 saw a constant in their 45-day SARIMA window and in the GBM lags. Corrected: every year
+   2022–2025 is loaded. SARIMA mean MAPE moves from 11.65 / 10.48 / 4.55 / 20.19 to
+   11.64 / 10.42 / 4.54 / 20.19, and day-1 MAPE from 7.85 / 6.75 / 3.38 / 16.06 to
+   7.81 / 6.69 / 3.37 / 16.07 (SE1 / SE2 / SE3 / SE4).
+2. **The GBM was trained on 34 daily origins, not 365** (28 November–31 December 2023), as in the
+   Norwegian primary split. The targets of the last four reached up to 96 h past `train_end`. Here they
+   fell in the forward-filled 2024 stretch. Corrected: the last 365 daily origins whose 96-h targets all
+   lie at or before `train_end` (28 December 2022 → 27 December 2023).
+
+SARIMA's fallback to diurnal persistence occurred at none of the origins in the version 1.4 runs.
+From version 1.5 a fallback is logged, flagged per row and counted instead of being silent.
+
+**What this changes in the sections below.**
+- *H0 outcome*: "SARIMA beats GBM in all four zones" and the GBM degradation +1.0 / +1.5 / +4.3 /
+  +3.6 pp are the 34-origin training. On the corrected runs the GBM has lower mean MAPE than SARIMA in
+  all four Swedish zones: −0.88 (SE1), −0.85 (SE2), −0.02 (SE3) and −2.64 (SE4) percentage points.
+  ADR-0004 registered no numerical threshold for "meaningfully", so the outcome is reported as
+  direction and size per zone.
+- *Concordance*: SARIMA's SE1/SE2 figures are unchanged (0.581 / 0.596). The corrected GBM ranks hours
+  better (0.622 / 0.624), so the direction-tracking weakness is reduced, not removed.
+- *2024-gap verification*: superseded by item 1. The gap was in the input and is now loaded.
+
+### Mean MAPE over days 1–4 (%), test 2025
+
+| Zone | flat | diurnal | SARIMA | GBM (corrected) | GBM (v1.4, as published) | GBM − SARIMA (pp) |
+|------|-----:|-----:|-----:|-----:|-----:|-----:|
+| SE1 | 12.28 | 12.90 | 11.64 | 10.76 | 12.66 | -0.88 |
+| SE2 | 10.89 | 11.85 | 10.42 | 9.57 | 11.95 | -0.85 |
+| SE3 | 7.87 | 4.96 | 4.54 | 4.53 | 8.88 | -0.02 |
+| SE4 | 25.51 | 21.74 | 20.19 | 17.54 | 23.77 | -2.64 |
+
+Day by day, MAPE (%):
+
+| Zone | Model | Day 1 | Day 2 | Day 3 | Day 4 |
+|------|-------|-----:|-----:|-----:|-----:|
+| SE1 | flat | 8.10 | 12.41 | 14.12 | 14.50 |
+| SE1 | diurnal | 10.63 | 12.77 | 14.03 | 14.19 |
+| SE1 | SARIMA | 7.81 | 11.88 | 13.26 | 13.61 |
+| SE1 | GBM (corrected) | 8.19 | 11.30 | 11.71 | 11.83 |
+| SE1 | GBM (v1.4) | 9.69 | 13.17 | 13.89 | 13.90 |
+| SE2 | flat | 7.02 | 10.92 | 12.56 | 13.05 |
+| SE2 | diurnal | 9.94 | 11.56 | 12.90 | 12.99 |
+| SE2 | SARIMA | 6.69 | 10.65 | 11.90 | 12.42 |
+| SE2 | GBM (corrected) | 7.17 | 9.88 | 10.52 | 10.71 |
+| SE2 | GBM (v1.4) | 9.43 | 13.05 | 12.73 | 12.60 |
+| SE3 | flat | 6.98 | 7.83 | 8.24 | 8.41 |
+| SE3 | diurnal | 3.99 | 4.95 | 5.38 | 5.51 |
+| SE3 | SARIMA | 3.37 | 4.61 | 4.98 | 5.21 |
+| SE3 | GBM (corrected) | 3.79 | 4.58 | 4.84 | 4.89 |
+| SE3 | GBM (v1.4) | 6.84 | 9.45 | 9.61 | 9.62 |
+| SE4 | flat | 22.86 | 25.54 | 26.47 | 27.17 |
+| SE4 | diurnal | 17.94 | 21.58 | 23.45 | 23.99 |
+| SE4 | SARIMA | 16.07 | 20.34 | 21.87 | 22.46 |
+| SE4 | GBM (corrected) | 15.03 | 18.23 | 18.26 | 18.66 |
+| SE4 | GBM (v1.4) | 21.64 | 25.31 | 24.30 | 23.83 |
+
+Concordance, mean over days 1–4 (day 1 in parentheses):
+
+| Zone | SARIMA | GBM (corrected) | GBM (v1.4, as published) |
+|------|-----:|-----:|-----:|
+| SE1 | 0.581 (0.610) | 0.622 (0.658) | 0.560 (0.597) |
+| SE2 | 0.596 (0.626) | 0.624 (0.653) | 0.587 (0.613) |
+| SE3 | 0.843 (0.847) | 0.856 (0.860) | 0.761 (0.786) |
+| SE4 | 0.822 (0.828) | 0.825 (0.835) | 0.680 (0.697) |
+
+Data: `~/khepri-data/eds-revisjon/_data/s2-j2b/` (flat, diurnal, SARIMA) and
+`~/khepri-data/eds-revisjon/_data/s2-ren/` (GBM). The version 1.5 code reproduces SE1 exactly
+(`~/khepri-data/eds-revisjon/_data/s3-v15/`, every row identical).
+
+---
+
+*Version 1.4 text follows, unchanged.*
+
 ## SARIMA — mean MAPE over days 1-4 (primary metric)
 
 | Zone | MAPE (%) | MAE (gCO2eq/kWh) | RMSE  | Concordance |
