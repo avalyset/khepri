@@ -45,7 +45,7 @@ Carbon intensity here is production-based and does not capture consumption-based
 
 ## Adoption
 
-The per-zone values have been contributed upstream to codecarbon in two pull requests — NO ([#1260](https://github.com/mlco2/codecarbon/pull/1260)) and SE ([#1262](https://github.com/mlco2/codecarbon/pull/1262)). Those values are **not** the AR5 figures tabulated above: at the maintainer's request they are re-derived on codecarbon's own factor table, with unfactored generation carried in the denominator at zero so the shipped number is a complete factor over all generation (ADR-0009). The maintainer folded the Swedish values into #1260 and merged it on 9 September 2026; #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The values are citable from this archived artifact independently of the pull requests.
+The per-zone values have been contributed upstream to codecarbon in two pull requests — NO ([#1260](https://github.com/mlco2/codecarbon/pull/1260)) and SE ([#1262](https://github.com/mlco2/codecarbon/pull/1262)). Those values are **not** the AR5 figures tabulated above: following a review comment on #1262 that offered two routes—re-derive on codecarbon's own factor table, or document a project-wide change of factor basis—we took the first, and they are re-derived on codecarbon's own factor table, with unfactored generation carried in the denominator at zero so the shipped number is a complete factor over all generation (ADR-0009). The shipped file cites version 1.3 of the archive; its nine values are identical in version 1.4. The maintainer folded the Swedish values into #1260 and merged it on 9 September 2026; #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The values are citable from this archived artifact independently of the pull requests.
 
 ## Reproduce
 
@@ -72,4 +72,4 @@ The CI, drift, and forecast steps are in `src/khepri/` (`ci.py`, `drift.py`, `fo
 
 ## Status
 
-Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). The per-zone values were taken upstream into codecarbon: the maintainer folded the Swedish values into #1260 and merged it on 9 September 2026, #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The consumption-based layer is not implemented. The current release is version 1.4.0; the concept DOI resolves to the latest archived version.
+Data core, drift, and forecast are complete and verified for all nine bidding zones (NO1–NO5, SE1–SE4). The per-zone values were taken upstream into codecarbon: the maintainer folded the Swedish values into #1260 and merged it on 9 September 2026, #1262 was closed as superseded, and the values ship in codecarbon 3.3.1. The consumption-based layer is not implemented. The current release is version 1.5.0 (prepared; not yet archived); the concept DOI resolves to the latest archived version.
